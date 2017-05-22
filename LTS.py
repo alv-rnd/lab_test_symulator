@@ -69,3 +69,28 @@ class Modulet:
         :param args: dodatkowe argumenty których zapomniałem zamieścić
         :param IO: parametr IN == True lub OUT == False (domyślnie False)
         """
+
+def randoms_from_sum(number, *args_max):
+    '''
+    Funkcja zwracająca losowe wartości których suma wynosi 'number'
+    :param number: Suma wygenerowanych losowo wartości
+    :param args_max: określa zakres maxymalny z którego wartości są dobierane
+    :return: 
+    '''
+    rand_list = []
+
+    while number - np.sum(rand_list) > 1:
+        total = number - np.sum(rand_list)
+        rand_num = (np.random.randint(*args_max) if args_max else np.random.randint(total)) #
+        rand_list.append((rand_num if not 0 else next()))
+        # if args_max:
+        #     rand_num = np.random.randint(*args_max)
+        # else:
+        #     rand_num = np.random.randint(total)
+        # rand_list.append((rand_num if not 0 else next()))
+
+
+    print(np.sum(rand_list), *args_max)
+    return rand_list
+
+print(randoms_from_sum(100, 35))
