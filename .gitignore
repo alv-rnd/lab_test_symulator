@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+/.idea/
+.idea/lab_test_symulator.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
