@@ -19,8 +19,10 @@ class Transport:
     wysyłanych ustaloną ilość razy na dobę
     '''
     pass
+    # zwiekszenie/inicjacja??? czasu w modulet
+    # zmiana statusu
 
-
+    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 class Check_in:
     '''
     klasa symulująca przyjęcie modułów,
@@ -28,7 +30,14 @@ class Check_in:
     zmiana statusu na 'x'
     '''
     pass
-
+    # zwiekszenie czasu w modulet
+    # zmiana statusu
+    # losowanie ratingów -> modulet
+    # losowanie temp -> modulet
+    # losowanie cond_time -> modulet
+    # losowanie in/out -> modulet
+    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
+    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 class Conditioning:
     '''
@@ -36,7 +45,11 @@ class Conditioning:
     ich pojemnościach i temperaturach.
     '''
     pass
+    # zwiekszenie czasu w modulet
+    # zmiana statusu
 
+    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, czasu trwania etapu itp
+    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 class Deployment:
     '''
@@ -44,14 +57,22 @@ class Deployment:
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
     pass
+    # zwiekszenie czasu w modulet
+    # zmiana statusu
 
+    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
+    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 class Analysis:
     '''
     zmiana statusu na finalny, dodanie oceny testu.
     '''
     pass
-
+    # zwiekszenie czasu w modulet
+    # zmiana statusu
+    # dodanie oceny
+    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
+    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 class Modulet:
     '''
@@ -73,9 +94,11 @@ class Modulet:
         self.status = status
         self.kind = kind
         self.eval = eval
-        self.projects = project
+        self.project = project
 
-
+        # dodać w inicie param log - pusty słownik
+        # gromadzenie logu czas: ilość moduletów w danym statusie - \
+        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 def randoms_from_sum(number, *args):
     '''
     Funkcja zwracająca losowe wartości których suma wynosi 'number'
@@ -122,5 +145,9 @@ def spread_from_sum(number, spread, *args):
             z = number - sum(rand_list)
             rand_list.append(z)
 
-    return rand_list, sum(rand_list)
+    return rand_list
 
+#######################################
+
+print(spread_from_sum(100, 20))
+print(randoms_from_sum(100, 20))
