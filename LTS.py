@@ -98,4 +98,30 @@ def randoms_from_sum(number, *args_max):
 
     return rand_list
 
-print(randoms_from_sum(100))
+def spread_from_sum(number, spread, *args):
+    '''
+    Funkcja generuje wartości których suma wynosi number a ilość wynosi spread
+    :param number: 
+    :param spreads: 
+    :return: 
+    '''
+
+    rand_list = []
+    x = number / spread
+    i = 1
+
+    while sum(rand_list) < number:
+        while i < spread:
+            y = np.random.choice([-1, 1]) * (np.random.randint(*args) if args else np.random.randint(x))
+            z = x + y
+            if z + sum(rand_list) > number or z <= 0:
+                break
+            rand_list.append(z)
+            i += 1
+        if i == spread:
+            z = number - sum(rand_list)
+            rand_list.append(z)
+
+    return rand_list
+
+print(spread_from_sum(100, 20))
