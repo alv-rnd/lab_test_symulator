@@ -79,20 +79,17 @@ def randoms_from_sum(number, *args_max):
     '''
     rand_list = []
 
-    while number - np.sum(rand_list) > 1:
-        total = number - int(np.sum(rand_list))
-        print(total)
+    while sum(rand_list) < number - 1:
+        total = number - sum(rand_list)
         rand_num = (np.random.randint(*args_max) if args_max else np.random.randint(total))
 
-        rand_list.append(rand_num if not 0 else next())
-        # if args_max:
-        #     rand_num = np.random.randint(*args_max)
-        # else:
-        #     rand_num = np.random.randint(total)
-        # rand_list.append((rand_num if not 0 else next()))
+        if rand_num is not 0:
+            if rand_num >= total:
+                rand_num = total
+            rand_list.append(rand_num)
 
+    if sum(rand_list) + 1 == number: rand_list[-1] += 1
 
-    print(np.sum(rand_list), *args_max, total)
     return rand_list
 
-print(randoms_from_sum(100, 20))
+print(randoms_from_sum(100))
