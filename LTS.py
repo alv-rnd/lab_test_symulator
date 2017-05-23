@@ -69,16 +69,6 @@ class Modulet:
         :param args: dodatkowe argumenty których zapomniałem zamieścić
         :param IO: parametr IN == True lub OUT == False (domyślnie False)
         """
-        self.times = times
-        self.status = status
-        self.kind = kind
-        self.eval = eval
-        self.projects = project
-
-    def
-
-
-
 
 def randoms_from_sum(number, *args_max):
     '''
