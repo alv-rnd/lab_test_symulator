@@ -76,7 +76,7 @@ class Modulet:
         self.projects = project
 
 
-def randoms_from_sum(number, *args_max):
+def randoms_from_sum(number, *args):
     '''
     Funkcja zwracająca losowe wartości których suma wynosi 'number'
     :param number: Suma wygenerowanych losowo wartości
@@ -87,7 +87,7 @@ def randoms_from_sum(number, *args_max):
 
     while sum(rand_list) < number - 1:
         total = number - sum(rand_list)
-        rand_num = (np.random.randint(*args_max) if args_max else np.random.randint(total))
+        rand_num = (np.random.randint(*args) if args else np.random.randint(total))
 
         if rand_num is not 0:
             if rand_num >= total:
@@ -107,7 +107,7 @@ def spread_from_sum(number, spread, *args):
     '''
 
     rand_list = []
-    x = number / spread
+    x = int(number / spread)
     i = 1
 
     while sum(rand_list) < number:
@@ -122,6 +122,5 @@ def spread_from_sum(number, spread, *args):
             z = number - sum(rand_list)
             rand_list.append(z)
 
-    return rand_list
+    return rand_list, sum(rand_list)
 
-print(spread_from_sum(100, 20))
