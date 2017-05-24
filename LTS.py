@@ -8,22 +8,28 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
+
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
         RSC(rsc_name).set_max_in(new_val)
 
+
 class RSC:
     '''klasa bazowa dla obiektow z grupy ReSourCes'''
-    def __init__(self, max_in=False, in_queue=[]):
+    def __init__(self, max_in=False, in_queue=[], loaded=[]):
         self.max_in = max_in
         self.in_queue = in_queue
+        self.loaded = loaded
         self.time = 0
     def set_max_in(self, new_val):
         self.max_in = new_val
+        # dodac ifa wracajacego do queue jesli new val < loaded
     def add_queue(self, testobj):
         self.in_queue.append(testobj)
     def del_queue(self, testobj):
         self.in_queue.__delitem__(testobj)
+    def load(self, testobj):
+        self.loaded.append(testobj)
 
 
 class Transport:
@@ -40,6 +46,21 @@ class Transport:
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
+    def __init__(self, *args):
+        super(RSC, self).__init__()
+
+        self.in_queue = []
+        self.loaded =  []
+        if args:
+            if len(args) == 1:
+                super(RSC_trunk, self).set_max_in(args[0])
+            elif len(args) == 2:
+                rand_val = np.random.randint(args[0], args[1])
+                super(RSC_trunk, self).set_max_in(rand_val)
+            else:
+                return 'ta klasa przyjmuje tylko jeden lub dwa argumenty'
+
+
     def set_max_in(self, *args):
         if len(args) == 1:
             super(RSC_trunk, self).set_max_in(args[0])
