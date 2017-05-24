@@ -8,7 +8,22 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-    pass
+    def set_max_in(self, rsc_name, new_val):
+        # Funkcja - RSC - do zmian argumentu max_in
+        RSC(rsc_name).set_max_in(new_val)
+
+class RSC:
+    '''klasa bazowa dla obiektow z grupy ReSourCes'''
+    def __init__(self, max_in=False, in_queue=[]):
+        self.max_in = max_in
+        self.in_queue = in_queue
+        self.time = 0
+    def set_max_in(self, new_val):
+        self.max_in = new_val
+    def add_queue(self, testobj):
+        self.in_queue.append(testobj)
+    def del_queue(self, testobj):
+        self.in_queue.__delitem__(testobj)
 
 
 class Transport:
@@ -19,10 +34,23 @@ class Transport:
     wysyłanych ustaloną ilość razy na dobę
     '''
     pass
-    # zwiekszenie/inicjacja??? czasu w modulet
+    # wywoływana przez klase Menage co 24h/ilość transportów
     # zmiana statusu
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
+class RSC_trunk(RSC):
+    def set_max_in(self, *args):
+        print('start')
+        if len(*args) == 1:
+            print('if 1')
+            super(RSC_trunk, self).set_max_in(*args[0])
+        elif len(*args) == 2:
+            print('if 2')
+            rand_val = np.random.randint(list(*args).sort())
+            super(RSC_trunk, self).set_max_in(rand_val)
+        else:
+            return 'funkcja przyjmuje tylko jeden lub dwa argumenty'
+
 class Check_in:
     '''
     klasa symulująca przyjęcie modułów,
@@ -39,6 +67,9 @@ class Check_in:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+class RSC_Store:
+    pass
+
 class Conditioning:
     '''
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
@@ -50,6 +81,9 @@ class Conditioning:
 
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
+
+class RSC_TC:
+    pass
 
 class Deployment:
     '''
@@ -63,6 +97,9 @@ class Deployment:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+class RSC_TR:
+    pass
+
 class Analysis:
     '''
     zmiana statusu na finalny, dodanie oceny testu.
@@ -73,6 +110,9 @@ class Analysis:
     # dodanie oceny
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
+
+class RSC_Analysis:
+    pass
 
 class Modulet:
     '''
@@ -99,6 +139,9 @@ class Modulet:
         # dodać w inicie param log - pusty słownik
         # gromadzenie logu czas: ilość moduletów w danym statusie - \
         # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
+
+    ### Funkcje: ###
+
 def randoms_from_sum(number, *args):
     '''
     Funkcja zwracająca losowe wartości których suma wynosi 'number'
@@ -148,6 +191,3 @@ def spread_from_sum(number, spread, *args):
     return rand_list
 
 #######################################
-
-print(spread_from_sum(100, 20))
-print(randoms_from_sum(100, 20))
