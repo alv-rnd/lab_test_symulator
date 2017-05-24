@@ -39,14 +39,12 @@ class Transport:
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 class RSC_trunk(RSC):
+    '''klasa definiujaca trumne'''
     def set_max_in(self, *args):
-        print('start')
-        if len(*args) == 1:
-            print('if 1')
-            super(RSC_trunk, self).set_max_in(*args[0])
-        elif len(*args) == 2:
-            print('if 2')
-            rand_val = np.random.randint(list(*args).sort())
+        if len(args) == 1:
+            super(RSC_trunk, self).set_max_in(args[0])
+        elif len(args) == 2:
+            rand_val = np.random.randint(args[0], args[1])
             super(RSC_trunk, self).set_max_in(rand_val)
         else:
             return 'funkcja przyjmuje tylko jeden lub dwa argumenty'
