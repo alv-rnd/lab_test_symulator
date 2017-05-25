@@ -11,7 +11,7 @@ class Manage:
 
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
-        RSC(rsc_name).set_max_in(new_val)
+        RSC_trunk(rsc_name).set_max_in(new_val)
 
 
 class RSC:
