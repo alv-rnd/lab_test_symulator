@@ -21,13 +21,20 @@ class RSC:
         self.in_queue = in_queue
         self.loaded = loaded
         self.time = 0
+
     def set_max_in(self, new_val):
+        # Funkcja przyjmuje jedynie jeden lub dwa argumenty liczbowe
         self.max_in = new_val
-        #TODO: dodac ifa wracajacego do queue jesli new val < loaded
+
+
+        # TODO: dodac ifa wracajacego do queue jesli new val < loaded
+
     def add_queue(self, testobj):
         self.in_queue.append(testobj)
+
     def del_queue(self, testobj):
         self.in_queue.remove(testobj)
+
     def load(self, testobj):
         if len(self.loaded) < self.max_in:
             self.loaded.append(testobj)
@@ -56,17 +63,7 @@ class RSC_trunk(RSC):
     def __init__(self, *args, **kws):
         super(RSC_trunk, self).__init__(**kws)
         # Klasa przyjmuje jedynie jeden lub dwa argumenty liczbowe
-        if len(args) > 2:
-            args = args[:2]
-        if args:
-            if len(args) == 1:
-                super(RSC_trunk, self).set_max_in(args[0])
-            elif len(args) == 2:
-                rand_val = np.random.randint(args[0], args[1])
-                super(RSC_trunk, self).set_max_in(rand_val)
 
-    def set_max_in(self, *args):
-        # Klasa przyjmuje jedynie jeden lub dwa argumenty liczbowe
         if len(args) > 2:
             args = args[:2]
         if args:
