@@ -14,6 +14,10 @@ class Manage:
         RSC_trunk(rsc_name).set_max_in(new_val)
 
 
+class Time:
+    pass
+
+
 class RSC:
     '''klasa bazowa dla obiektow z grupy ReSourCes'''
     def __init__(self, max_in=False, in_queue=[], loaded=[]):
@@ -223,3 +227,39 @@ def spread_from_sum(number, spread, *args):
     return rand_list
 
 #######################################
+
+from random import randint as ri
+
+
+class Temp:
+    # klasa do testów
+    def __init__(self, d1, d2, d3, d4):
+        self.d1 = d1
+        self.d2 = d2
+        self.d3 = d3
+        self.d4 = d4
+
+    def wyprintuj(self):
+        print(self.d1, self.d2, self.d3, self.d4)
+
+
+# pusta lista dla instancji klasy Temp
+l = []
+
+# generator wielu istancji klasy Temp
+for i in range(0, 10):
+    l.append(Temp(ri(10, 20), ri(20, 30), ri(30, 40), ri(40, 50)))
+
+print(l)
+
+#wywołanie funkcji z dwóch istancji klasy Temp (inne randomy)
+l[0].wyprintuj()
+l[2].wyprintuj()
+# czyli naszą nazwą testu (Test1) będzie indeks obiektu z listy czyli 'Test' + index obiektu,
+# tylko czy to w ogóle będzie potrzebne, ta nazwa instancji, bo możemy działać na indeksach listy
+
+#każdy element w liście, jak i sama lista, mają inne ID czyli to są można powiedzieć inne istancje tej samej klasy
+print(id(l))
+print(id(l[0]))
+print(id(l[4]))
+print(id(l[7]))
