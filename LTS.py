@@ -23,13 +23,17 @@ class RSC:
         self.time = 0
     def set_max_in(self, new_val):
         self.max_in = new_val
-        # dodac ifa wracajacego do queue jesli new val < loaded
+        #TODO: dodac ifa wracajacego do queue jesli new val < loaded
     def add_queue(self, testobj):
         self.in_queue.append(testobj)
     def del_queue(self, testobj):
-        self.in_queue.__delitem__(testobj)
+        self.in_queue.remove(testobj)
     def load(self, testobj):
-        self.loaded.append(testobj)
+        if len(self.loaded) < self.max_in:
+            self.loaded.append(testobj)
+        else:
+            self.in_queue.append(testobj)
+        # TODO: przekazywanie informacji do logów
 
 
 class Transport:
@@ -44,31 +48,34 @@ class Transport:
     # zmiana statusu
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
+
+
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
-    def __init__(self, *args):
-        super(RSC, self).__init__()
 
-        self.in_queue = []
-        self.loaded =  []
+    def __init__(self, *args, **kws):
+        super(RSC_trunk, self).__init__(**kws)
+        # Klasa przyjmuje jedynie jeden lub dwa argumenty liczbowe
+        if len(args) > 2:
+            args = args[:2]
         if args:
             if len(args) == 1:
                 super(RSC_trunk, self).set_max_in(args[0])
             elif len(args) == 2:
                 rand_val = np.random.randint(args[0], args[1])
                 super(RSC_trunk, self).set_max_in(rand_val)
-            else:
-                return 'ta klasa przyjmuje tylko jeden lub dwa argumenty'
-
 
     def set_max_in(self, *args):
-        if len(args) == 1:
-            super(RSC_trunk, self).set_max_in(args[0])
-        elif len(args) == 2:
-            rand_val = np.random.randint(args[0], args[1])
-            super(RSC_trunk, self).set_max_in(rand_val)
-        else:
-            return 'funkcja przyjmuje tylko jeden lub dwa argumenty'
+        # Klasa przyjmuje jedynie jeden lub dwa argumenty liczbowe
+        if len(args) > 2:
+            args = args[:2]
+        if args:
+            if len(args) == 1:
+                super(RSC_trunk, self).set_max_in(args[0])
+            elif len(args) == 2:
+                rand_val = np.random.randint(args[0], args[1])
+                super(RSC_trunk, self).set_max_in(rand_val)
+
 
 class Check_in:
     '''
@@ -86,8 +93,10 @@ class Check_in:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+
 class RSC_Store:
     pass
+
 
 class Conditioning:
     '''
@@ -101,8 +110,10 @@ class Conditioning:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+
 class RSC_TC:
     pass
+
 
 class Deployment:
     '''
@@ -116,8 +127,10 @@ class Deployment:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+
 class RSC_TR:
     pass
+
 
 class Analysis:
     '''
@@ -130,8 +143,10 @@ class Analysis:
     # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
+
 class RSC_Analysis:
     pass
+
 
 class Modulet:
     '''
@@ -160,6 +175,7 @@ class Modulet:
         # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 
     ### Funkcje: ###
+
 
 def randoms_from_sum(number, *args):
     '''
