@@ -28,10 +28,13 @@ class RSC:
 
     def set_max_in(self, new_val):
         # Funkcja przyjmuje jedynie jeden lub dwa argumenty liczbowe
-        self.max_in = new_val
-
-
-        # TODO: dodac ifa wracajacego do queue jesli new val < loaded
+        # self.max_in = new_val
+        if new_val > len(self.loaded):
+            self.max_in = new_val
+        else:
+           self.in_queue = self.loaded[new_val:] + self.in_queue
+           self.loaded =  self.loaded[:new_val]
+           self.max_in = new_val
 
     def add_queue(self, testobj):
         self.in_queue.append(testobj)
@@ -155,30 +158,42 @@ class Modulet:
     '''
     ab_kind = 'dab pab sab kab ic'.split()
 
-    def __init__(self, times, status, kind, eval, project, *args, IO=False):
-        """
-        :param times: czas życia modułu, zwiększany przy zmianie statusu
-        :param status: status modułu, zmieniany z każdym etapem
-        :param kind: randomowy numer, który będzie definiował rodzaj poduszki.[ random.randint(0, len(ab_king)) ]
-        :param eval: ocena testu ['OK', 'NOK', 'INVALID']
-        :param project: liczba określająca projekt (jedna liczba == jeden projekt) generowana z podanego zakresu
-        :param args: dodatkowe argumenty których zapomniałem zamieścić
-        :param IO: parametr IN == True lub OUT == False (domyślnie False)
-        """
-        self.times = times
-        self.status = status
-        self.kind = kind
-        self.eval = eval
-        self.project = project
+    # def __init__(self, times, status, kind, eval, project, *args, IO=False):
+    #     """
+    #     :param times: czas życia modułu, zwiększany przy zmianie statusu
+    #     :param status: status modułu, zmieniany z każdym etapem
+    #     :param kind: randomowy numer, który będzie definiował rodzaj poduszki.[ random.randint(0, len(ab_king)) ]
+    #     :param eval: ocena testu ['OK', 'NOK', 'INVALID']
+    #     :param project: liczba określająca projekt (jedna liczba == jeden projekt) generowana z podanego zakresu
+    #     :param args: dodatkowe argumenty których zapomniałem zamieścić
+    #     :param IO: parametr IN == True lub OUT == False (domyślnie False)
+    #     """
+    #     self.times = times
+    #     self.status = status
+    #     self.kind = kind
+    #     self.eval = eval
+    #     self.project = project
+    #
+    #     # dodać w inicie param log - pusty słownik
+    #     # gromadzenie logu czas: ilość moduletów w danym statusie - \
+    #     # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
+    #
+    # ### Funkcje: ###
 
-        # dodać w inicie param log - pusty słownik
-        # gromadzenie logu czas: ilość moduletów w danym statusie - \
-        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 
-    ### Funkcje: ###
-
+class GEN(type):
+    '''klasa do tworzenia inastancji klasy Modulet (modul testowy'''
+    def __new__(cls, name, dct={}):
+        '''
+        Zwraca instanje klasy Modulet na returnie
+        :param name: nazwa instancji
+        :param dct: argumenty jakie ma przyjac instancja - domyslnie brak
+        :return: Obiekt klasy Modulet
+        '''
+        return type.__new__(cls, name, (Modulet, object), dct)
 
 def randoms_from_sum(number, *args):
+
     '''
     Funkcja zwracająca losowe wartości których suma wynosi 'number'
     :param number: Suma wygenerowanych losowo wartości
@@ -199,6 +214,7 @@ def randoms_from_sum(number, *args):
     if sum(rand_list) + 1 == number: rand_list[-1] += 1
 
     return rand_list
+
 
 def spread_from_sum(number, spread, *args):
     '''
@@ -263,3 +279,25 @@ print(id(l))
 print(id(l[0]))
 print(id(l[4]))
 print(id(l[7]))
+
+class NIE_DUP_W_NOSIE:
+    '''wrzuc sobie to do skrecza i przetestuj'''
+    pass
+    # import LTS
+    # trumna = LTS.RSC_trunk(5)
+    #
+    # def generate_test(qty):
+    #     # na potrzeby budowy programu
+    #     for i in range(qty):
+    #         test_name = 'Test{}'.format(i + 1)
+    #
+    #         trumna.load(LTS.GEN(test_name))
+    #     else:
+    #         test_name = None
+    #
+    # generate_test(10)
+    #
+    # for test in trumna.loaded:
+    #     print(test.__name__)
+    # print(trumna.in_queue)
+    # print(trumna.max_in)
