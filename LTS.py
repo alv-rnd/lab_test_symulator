@@ -8,6 +8,12 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
+    def __init__(self, module_qty):
+        self.module_qty = module_qty
+
+    def sim_run(self):
+        general_time = Time()
+        first_run = RSC_trunk()
 
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
@@ -15,7 +21,21 @@ class Manage:
 
 
 class Time:
-    pass
+    time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
+    def __init__(self, time_format='min', value=None):
+        self.time_init = 0
+
+    def time_add(self, event_name, event_time):
+        self.event_name = event_name
+        self.event_time = event_time
+        current_general_time = self.time_init + self.event_time
+
+
+class Event:
+    def __init__(self, event_time):
+        self.event_time = event_time
+
+    def run_event(self):
 
 
 class RSC:
@@ -50,19 +70,22 @@ class RSC:
         # TODO: przekazywanie informacji do logów
 
 
-class Transport:
+class Transport(Event):
     '''
     Klasa symulująca transport:
     ilosć wysztskich modułów przewidzianych na testy
     podzielona na trumny o losowej pojemnosci z określonego zakresu (symulacja produkcji)
     wysyłanych ustaloną ilość razy na dobę
     '''
-    pass
+    def __init__(self, *args):
+        super(Transport).__init__()
+
+
     # wywoływana przez klase Menage co 24h/ilość transportów
     # zmiana statusu
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
-
+t = Transport.
 
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
@@ -180,6 +203,9 @@ class Modulet:
     #
     # ### Funkcje: ###
 
+        # dodać w inicie param log - pusty słownik
+        # gromadzenie logu czas: ilość moduletów w danym statusie - \
+        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 
 class GEN(type):
     '''klasa do tworzenia inastancji klasy Modulet (modul testowy'''
@@ -244,60 +270,4 @@ def spread_from_sum(number, spread, *args):
 
 #######################################
 
-from random import randint as ri
 
-
-class Temp:
-    # klasa do testów
-    def __init__(self, d1, d2, d3, d4):
-        self.d1 = d1
-        self.d2 = d2
-        self.d3 = d3
-        self.d4 = d4
-
-    def wyprintuj(self):
-        print(self.d1, self.d2, self.d3, self.d4)
-
-
-# pusta lista dla instancji klasy Temp
-l = []
-
-# generator wielu istancji klasy Temp
-for i in range(0, 10):
-    l.append(Temp(ri(10, 20), ri(20, 30), ri(30, 40), ri(40, 50)))
-
-print(l)
-
-#wywołanie funkcji z dwóch istancji klasy Temp (inne randomy)
-l[0].wyprintuj()
-l[2].wyprintuj()
-# czyli naszą nazwą testu (Test1) będzie indeks obiektu z listy czyli 'Test' + index obiektu,
-# tylko czy to w ogóle będzie potrzebne, ta nazwa instancji, bo możemy działać na indeksach listy
-
-#każdy element w liście, jak i sama lista, mają inne ID czyli to są można powiedzieć inne istancje tej samej klasy
-print(id(l))
-print(id(l[0]))
-print(id(l[4]))
-print(id(l[7]))
-
-class NIE_DUP_W_NOSIE:
-    '''wrzuc sobie to do skrecza i przetestuj'''
-    pass
-    # import LTS
-    # trumna = LTS.RSC_trunk(5)
-    #
-    # def generate_test(qty):
-    #     # na potrzeby budowy programu
-    #     for i in range(qty):
-    #         test_name = 'Test{}'.format(i + 1)
-    #
-    #         trumna.load(LTS.GEN(test_name))
-    #     else:
-    #         test_name = None
-    #
-    # generate_test(10)
-    #
-    # for test in trumna.loaded:
-    #     print(test.__name__)
-    # print(trumna.in_queue)
-    # print(trumna.max_in)
