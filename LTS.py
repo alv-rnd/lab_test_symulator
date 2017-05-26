@@ -8,12 +8,16 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-    def __init__(self, module_qty):
+    def __init__(self, module_qty, init=False):
         self.module_qty = module_qty
+        self.init = init
+        print(self.init)
 
     def sim_run(self):
+        self.init = True
+        print(self.init)
         general_time = Time()
-        first_run = RSC_trunk()
+        first_run = Transport()
 
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
@@ -23,19 +27,21 @@ class Manage:
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
     def __init__(self, time_format='min', value=None):
+        self.time_format = time_format
+        self.value = value
         self.time_init = 0
 
     def time_add(self, event_name, event_time):
         self.event_name = event_name
         self.event_time = event_time
-        current_general_time = self.time_init + self.event_time
+        current_general_time = self.time_init + event_time
 
 
 class Event:
     def __init__(self, event_time):
         self.event_time = event_time
 
-    def run_event(self):
+    def run_event(self, module_qty):
 
 
 class RSC:
@@ -78,14 +84,15 @@ class Transport(Event):
     wysyłanych ustaloną ilość razy na dobę
     '''
     def __init__(self, *args):
-        super(Transport).__init__()
+        super(Transport).__init__(*args)
+
 
 
     # wywoływana przez klase Menage co 24h/ilość transportów
     # zmiana statusu
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
-t = Transport.
+
 
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
