@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import random
 
 
 class Manage:
@@ -38,10 +39,16 @@ class Time:
 
 
 class Event:
-    def __init__(self, event_time):
+    def __init__(self, event_time, pull_from=None, push_to=None):
+
         self.event_time = event_time
+        self.pull_from = pull_from
+        self.push_to = push_to
 
     def run_event(self, module_qty):
+        #for i in module_qty:
+            # if
+        pass
 
 
 class RSC:
@@ -68,12 +75,14 @@ class RSC:
     def del_queue(self, testobj):
         self.in_queue.remove(testobj)
 
-    def load(self, testobj):
+    def load(self, test, event_duration):
+        # test.hist_update
         if len(self.loaded) < self.max_in:
-            self.loaded.append(testobj)
+            self.loaded.append(test)
         else:
-            self.in_queue.append(testobj)
+            self.in_queue.append(test)
         # TODO: przekazywanie informacji do logów
+        # TODO: obsluga czasow
 
 
 class Transport(Event):
@@ -83,16 +92,40 @@ class Transport(Event):
     podzielona na trumny o losowej pojemnosci z określonego zakresu (symulacja produkcji)
     wysyłanych ustaloną ilość razy na dobę
     '''
-    def __init__(self, *args):
-        super(Transport).__init__(*args)
+    def __init__(self, pull_from, push_to, *args):
+        super(Transport, self).__init__(*args)
+        self.pull_from = pull_from
+        self.push_to = push_to
 
+        # TODO: czy po Transport nie powinno być self?
+        # TODO: sprawdziłem powinn
+    def add_time(self, module):
+        # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
+        module.add_time(self.event_time)
+    def add_to_log(self, module):
+        log = {'2' : [module, 'Transport']}
+        module.add_to_log(log)
+    def run_event(self, module_qty=0):
+        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
+        # zaczynając od poczatku listy
+        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
+        # dla poszczegolnych eventów. W przypadku uzycia argumentu
+        # module_qty narzucony jest limit przenoszonych testów
 
+        print(self.pull_from)
+        while len(self.pull_from) > module_qty:
+            t = self.pull_from.pop(0)
+            self.add_time(t)
+            self.add_to_log(t)
+            print(t.log)
+            self.push_to.load(t, self.event_time)
+        print(self.pull_from)
+        print(self.push_to.loaded)
 
     # wywoływana przez klase Menage co 24h/ilość transportów
     # zmiana statusu
 
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
-
 
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
@@ -111,7 +144,7 @@ class RSC_trunk(RSC):
                 super(RSC_trunk, self).set_max_in(rand_val)
 
 
-class Check_in:
+class Check_in(Event):
     '''
     klasa symulująca przyjęcie modułów,
     w obrębie której nastepuje losowanie ratingów, in/out, , temperatur, cond_time i innych atrybutów skojarzonych z modułem
@@ -132,7 +165,7 @@ class RSC_Store:
     pass
 
 
-class Conditioning:
+class Conditioning(Event):
     '''
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
@@ -149,7 +182,7 @@ class RSC_TC:
     pass
 
 
-class Deployment:
+class Deployment(Event):
     '''
     Klasa symulująca przeprowandzenia testu. Zmiana statusu
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
@@ -166,7 +199,7 @@ class RSC_TR:
     pass
 
 
-class Analysis:
+class Analysis(Event):
     '''
     zmiana statusu na finalny, dodanie oceny testu.
     '''
@@ -188,26 +221,39 @@ class Modulet:
     '''
     ab_kind = 'dab pab sab kab ic'.split()
 
-    # def __init__(self, times, status, kind, eval, project, *args, IO=False):
-    #     """
-    #     :param times: czas życia modułu, zwiększany przy zmianie statusu
-    #     :param status: status modułu, zmieniany z każdym etapem
-    #     :param kind: randomowy numer, który będzie definiował rodzaj poduszki.[ random.randint(0, len(ab_king)) ]
-    #     :param eval: ocena testu ['OK', 'NOK', 'INVALID']
-    #     :param project: liczba określająca projekt (jedna liczba == jeden projekt) generowana z podanego zakresu
-    #     :param args: dodatkowe argumenty których zapomniałem zamieścić
-    #     :param IO: parametr IN == True lub OUT == False (domyślnie False)
-    #     """
-    #     self.times = times
-    #     self.status = status
-    #     self.kind = kind
-    #     self.eval = eval
-    #     self.project = project
-    #
-    #     # dodać w inicie param log - pusty słownik
-    #     # gromadzenie logu czas: ilość moduletów w danym statusie - \
-    #     # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
-    #
+    def __init__(self, projects=4, time=0, status=0):
+        """
+        :param times: czas życia modułu, zwiększany przy zmianie statusu
+        :param status: status modułu, zmieniany z każdym etapem
+        :param kind: randomowy numer, który będzie definiował rodzaj poduszki.[ random.randint(0, len(ab_king)) ]
+        :param eval: ocena testu ['OK', 'NOK', 'INVALID']
+        :param project: liczba określająca projekt (jedna liczba == jeden projekt) generowana z podanego zakresu
+        :param args: dodatkowe argumenty których zapomniałem zamieścić
+        :param IO: parametr IN == True lub OUT == False (domyślnie False)
+        """
+        self.time = time
+        self.status = status
+        self.kind = random.choice(self.ab_kind)
+        self.project = str(random.randint(0, projects))
+        self.result_eval = None
+        self.log = {}
+
+    def my_time(self):
+        #pokaz swoj czas
+        return self.time
+
+    def add_time(self, event_time):
+        self.time += event_time
+
+    def add_to_log(self, test_ev):
+        self.log.update(test_ev)
+
+
+
+        # dodać w inicie param log - pusty słownik
+        # gromadzenie logu czas: ilość moduletów w danym statusie - \
+        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
+
     # ### Funkcje: ###
 
         # dodać w inicie param log - pusty słownik
@@ -223,8 +269,9 @@ class GEN(type):
         :param dct: argumenty jakie ma przyjac instancja - domyslnie brak
         :return: Obiekt klasy Modulet
         '''
-        return type.__new__(cls, name, (Modulet, object), dct)
-
+        base = Modulet
+        return type.__new__(cls, name, (base, object), dct)
+    # TODO: zwracany obiekty jest klasy GEN a nie modulet
 def randoms_from_sum(number, *args):
 
     '''
