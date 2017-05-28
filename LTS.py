@@ -48,7 +48,7 @@ class Time:
 
 
 class Event:
-    def __init__(self, event_time, pull_from=None, push_to=None):
+    def __init__(self, pull_from, push_to, event_time):
 
         self.event_time = event_time
         self.pull_from = pull_from
@@ -103,20 +103,18 @@ class Transport(Event):
     podzielona na trumny o losowej pojemnosci z określonego zakresu (symulacja produkcji)
     wysyłanych ustaloną ilość razy na dobę
     '''
-    def __init__(self, pull_from, push_to, *args):
+    def __init__(self, *args):
         super(Transport, self).__init__(*args)
-        self.pull_from = pull_from
-        self.push_to = push_to
 
         # TODO: czy po Transport nie powinno być self?
         # TODO: sprawdziłem powinn
     def add_time(self, module):
         # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
         module.add_time(self.event_time)
+
     def add_to_log(self, module):
         log = {module.time : ['transport', module]}
         module.add_to_log(log)
-
 
     def run_event(self, module_qty=0):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
@@ -168,7 +166,8 @@ class Check_in(Event):
     w obrębie której nastepuje losowanie ratingów, in/out, , temperatur, cond_time i innych atrybutów skojarzonych z modułem
     zmiana statusu na 'x'
     '''
-    pass
+    def __init__(self):
+
     # zwiekszenie czasu w modulet
     # zmiana statusu
     # losowanie ratingów -> modulet
@@ -179,9 +178,11 @@ class Check_in(Event):
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
-class RSC_Store:
-    pass
-
+class RSC_Store(RSC):
+    '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
+    def __init__(self):
+        super(RSC, self).__init__()
+        self.max_in = 1000
 
 class Conditioning(Event):
     '''
