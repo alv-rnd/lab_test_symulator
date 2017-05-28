@@ -75,8 +75,8 @@ class RSC:
     def del_queue(self, testobj):
         self.in_queue.remove(testobj)
 
-    def load(self, test, event_duration):
-        # test.hist_update
+    def load(self, test):
+        #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
         if len(self.loaded) < self.max_in:
             self.loaded.append(test)
         else:
@@ -235,7 +235,7 @@ class Modulet:
         self.status = status
         self.kind = random.choice(self.ab_kind)
         self.project = str(random.randint(0, projects))
-        self.result_eval = None
+        self.result_eval = False
         self.log = {}
 
     def my_time(self):
