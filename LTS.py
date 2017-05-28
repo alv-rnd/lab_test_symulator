@@ -9,6 +9,15 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
+    event_sequence = ['Transport', 'Check_in', 'Conditioning',\
+                      'Deployment', 'Analysis']
+    # Lista zdarzeń do sprawdzenia kolejnego zdarzenia ktore
+    # mozna wykonac: petla while (np) leci po kazdym dodanym resourcie
+    # i spr rsc.in_queue lub .loaded (jedno z dwojga zaleznie od podejsia)
+    # i jezeli taka lista jest nie pusta odnajduje zaciagajacy lub wypychajacy
+    # event - albo zupełnie inaczej - np. eventy wyzwalaja
+    # sasiadujce eventy miedzy soba z automatu, albo
+    # roznie w zależności od rodzju procesu
     def __init__(self, module_qty, init=False):
         self.module_qty = module_qty
         self.init = init
@@ -51,12 +60,14 @@ class Event:
         pass
 
 
+
 class RSC:
+
     '''klasa bazowa dla obiektow z grupy ReSourCes'''
-    def __init__(self, max_in=False, in_queue=[], loaded=[]):
+    def __init__(self, max_in=False):
         self.max_in = max_in
-        self.in_queue = in_queue
-        self.loaded = loaded
+        self.in_queue = []
+        self.loaded = []
         self.time = 0
 
     def set_max_in(self, new_val):
@@ -103,8 +114,10 @@ class Transport(Event):
         # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
         module.add_time(self.event_time)
     def add_to_log(self, module):
-        log = {'2' : [module, 'Transport']}
+        log = {module.time : ['transport', module]}
         module.add_to_log(log)
+
+
     def run_event(self, module_qty=0):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
@@ -113,12 +126,17 @@ class Transport(Event):
         # module_qty narzucony jest limit przenoszonych testów
 
         print(self.pull_from)
-        while len(self.pull_from) > module_qty:
+        while len(self.pull_from) > module_qty and\
+                len(self.push_to.loaded) < self.push_to.max_in:
             t = self.pull_from.pop(0)
-            self.add_time(t)
+
             self.add_to_log(t)
+            self.push_to.load(t)
+            self.add_time(t)
+
             print(t.log)
-            self.push_to.load(t, self.event_time)
+            # najpierw log, potem add tak by w logu widniał czas poczatkowy
+
         print(self.pull_from)
         print(self.push_to.loaded)
 
@@ -221,7 +239,7 @@ class Modulet:
     '''
     ab_kind = 'dab pab sab kab ic'.split()
 
-    def __init__(self, projects=4, time=0, status=0):
+    def __init__(self, name, projects=4, time=0, status=0):
         """
         :param times: czas życia modułu, zwiększany przy zmianie statusu
         :param status: status modułu, zmieniany z każdym etapem
@@ -231,6 +249,7 @@ class Modulet:
         :param args: dodatkowe argumenty których zapomniałem zamieścić
         :param IO: parametr IN == True lub OUT == False (domyślnie False)
         """
+        self.name = name
         self.time = time
         self.status = status
         self.kind = random.choice(self.ab_kind)
