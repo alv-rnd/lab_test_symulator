@@ -3,12 +3,14 @@
 import pandas as pd
 import numpy as np
 import random
+import os
 
 
 class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
+    init = False
     event_sequence = ['Transport', 'Check_in', 'Conditioning',\
                       'Deployment', 'Analysis']
     # Lista zdarzeń do sprawdzenia kolejnego zdarzenia ktore
@@ -18,16 +20,16 @@ class Manage:
     # event - albo zupełnie inaczej - np. eventy wyzwalaja
     # sasiadujce eventy miedzy soba z automatu, albo
     # roznie w zależności od rodzju procesu
-    def __init__(self, module_qty, init=False):
+    def __init__(self, module_qty):
         self.module_qty = module_qty
-        self.init = init
         print(self.init)
 
     def sim_run(self):
+        first_run = Transport()
         self.init = True
         print(self.init)
         general_time = Time()
-        first_run = Transport()
+
 
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
@@ -41,10 +43,18 @@ class Time:
         self.value = value
         self.time_init = 0
 
-    def time_add(self, event_name, event_time):
-        self.event_name = event_name
-        self.event_time = event_time
-        current_general_time = self.time_init + event_time
+    def add_time_module(self, modulet):
+        self.modulet = modulet
+
+
+    def add_real_time(self):
+        pass
+        # current_general_time = self.time_init +
+
+    def make_log(self):
+        pass
+        #log = pd
+
 
 
 class Event:
@@ -55,8 +65,11 @@ class Event:
         self.event_time = event_time
 
     def add_time(self, module):
-        # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
+        # uzywana w run_event do zmiany czasu odwoluje sie do
+        # funkcji o tej samej nazwie w Modulet
         module.add_time(self.event_time)
+
+
 
     def add_to_log(self, module):
         log = {module.time: ['transport', module]}
@@ -114,9 +127,6 @@ class Transport(Event):
     def __init__(self, *args):
         super(Transport, self).__init__(*args)
 
-        # TODO: czy po Transport nie powinno być self?
-        # TODO: sprawdziłem powinn
-
     def run_event(self, *args):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
@@ -124,8 +134,6 @@ class Transport(Event):
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        if not args:
-            #poprawic
         while len(self.pull_from) > module_qty and\
                 len(self.push_to.loaded) < self.push_to.max_in:
             t = self.pull_from.pop(0)
