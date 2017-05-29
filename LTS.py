@@ -59,10 +59,44 @@ class Event:
         module.add_time(self.event_time)
 
     def add_to_log(self, module):
-        log = {module.time: ['transport', module]}
+        log = {module.time: ['Event', module]}
         module.add_to_log(log)
 
+    def run_event(self, module_qty=False):
+        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
+        # zaczynając od poczatku listy
+        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
+        # dla poszczegolnych eventów. W przypadku uzycia argumentu
+        # module_qty narzucony jest limit przenoszonych testów
 
+        def run_Forest():
+            t = self.pull_from.loaded.pop(0)
+
+            self.add_to_log(t)
+            self.push_to.load(t)
+            self.add_time(t)
+
+        if self.push_to.max_in == False:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0:
+                    #print('max in = False & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0:
+                    #print('max in = False & mod_qty = True')
+                    run_Forest()
+                    module_qty -= 1
+        else:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = True')
+                    run_Forest()
 
 
 class RSC:
@@ -167,12 +201,21 @@ class Check_in(Event):
     w obrębie której nastepuje losowanie ratingów, in/out, , temperatur, cond_time i innych atrybutów skojarzonych z modułem
     zmiana statusu na 'x'
     '''
+    project_qty = 4
     def __init__(self, *args):
         super(Check_in, self).__init__(*args)
 
+    def set_project_qty(self, qty):
+        self.project_qty = qty
+
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
-        pass
+        # event_sequence = ['Transport', 'Check_in', 'Conditioning',
+        #                   'Deployment', 'Analysis']
+        test.project = random.randint(1, self.project_qty + 1)
+        test.type = random.choice(Modulet.ab_kind)
+        test.status = 'Check_in'
+        print(test.type, test.project, test.status)
 
     def run_event(self, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
@@ -183,7 +226,7 @@ class Check_in(Event):
 
         def run_Forest():
             t = self.pull_from.loaded.pop(0)
-
+            self.gen_rand_testparam(t)
             self.add_to_log(t)
             self.push_to.load(t)
             self.add_time(t)
@@ -191,23 +234,23 @@ class Check_in(Event):
         if self.push_to.max_in == False:
             if module_qty == False:
                 while len(self.pull_from.loaded) > 0:
-                    #print('max in = False & mod_qty = False')
+                    # print('max in = False & mod_qty = False')
                     run_Forest()
             else:
                 while len(self.pull_from.loaded) > 0 and module_qty > 0:
-                    #print('max in = False & mod_qty = True')
+                    # print('max in = False & mod_qty = True')
                     run_Forest()
                     module_qty -= 1
         else:
             if module_qty == False:
                 while len(self.pull_from.loaded) > 0 and \
                                         self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = False')
+                    # print('max in = True & mod_qty = False')
                     run_Forest()
             else:
                 while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
                                         self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = True')
+                    # print('max in = True & mod_qty = True')
                     run_Forest()
 
     # zwiekszenie czasu w modulet
@@ -282,7 +325,7 @@ class Modulet:
     '''
     ab_kind = 'dab pab sab kab ic'.upper().split()
 
-    def __init__(self, name, projects=4, time=0, status=0):
+    def __init__(self, name):
         """
         :param times: czas życia modułu, zwiększany przy zmianie statusu
         :param status: status modułu, zmieniany z każdym etapem
@@ -293,10 +336,10 @@ class Modulet:
         :param IO: parametr IN == True lub OUT == False (domyślnie False)
         """
         self.name = name
-        self.time = time
-        self.status = status
-        self.kind = random.choice(self.ab_kind)
-        self.project = str(self.kind) + '_00' + str(random.randint(0, projects))
+        self.time = 0
+        self.status = None
+        self.kind = None
+        self.project = None
         self.result_eval = False
         self.log = {}
 
