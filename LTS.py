@@ -11,8 +11,9 @@ class Manage:
     Klasa zarządzająca wszytkim
     '''
     init = False
-    event_sequence = ['Transport', 'Check_in', 'Conditioning',\
-                      'Deployment', 'Analysis']
+    ratings = {'1': [[1, 2, 1], [0, 0, 0]],
+               '2': [[1, 1, 1], [0, 0, 0]],
+               '3': [[2, 1, 1], [0, 0, 0]]}
     # Lista zdarzeń do sprawdzenia kolejnego zdarzenia ktore
     # mozna wykonac: petla while (np) leci po kazdym dodanym resourcie
     # i spr rsc.in_queue lub .loaded (jedno z dwojga zaleznie od podejsia)
@@ -212,7 +213,7 @@ class Check_in(Event):
     w obrębie której nastepuje losowanie ratingów, in/out, , temperatur, cond_time i innych atrybutów skojarzonych z modułem
     zmiana statusu na 'x'
     '''
-    project_qty = 4
+    project_qty = 3
     def __init__(self, *args):
         super(Check_in, self).__init__(*args)
 
@@ -221,12 +222,12 @@ class Check_in(Event):
 
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
-        # event_sequence = ['Transport', 'Check_in', 'Conditioning',
-        #                   'Deployment', 'Analysis']
         test.project = random.randint(1, self.project_qty + 1)
         test.type = random.choice(Modulet.ab_kind)
-        test.status = 'Check_in'
-        print(test.type, test.project, test.status)
+        #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
+        if str(test.project) in Manage.ratings.keys():
+            print('kupa')
+        else: test.temp = random.choice([-35, 23, 85])
 
     def run_event(self, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
@@ -237,10 +238,11 @@ class Check_in(Event):
 
         def run_Forest():
             t = self.pull_from.loaded.pop(0)
-            self.gen_rand_testparam(t)
-            self.add_to_log(t)
-            self.push_to.load(t)
-            self.add_time(t)
+            self.gen_rand_testparam(t) # nadajemy losowe parametry
+            t.status = 'Checked in' # updateujemy status
+            self.add_to_log(t)    # updatujemy logi
+            self.push_to.load(t)  # przenosimy miedzy zasobami
+            self.add_time(t)      # updateujemy self.time modulu
 
         if self.push_to.max_in == False:
             if module_qty == False:
@@ -293,9 +295,15 @@ class Conditioning(Event):
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
-class RSC_TC:
-    pass
-
+class RSC_TC(RSC):
+    '''klasa definiujaca obiekty TemperatureChambers'''
+    temp_range = [-40, -35, -30, -25, 23, 80, 85, 90]
+    def __init__(self, name=None, temp=None):
+        self.name = name
+        self.temp = temp
+        super(RSC_TC, self).__init__()
+    def set_temp(self, temp):
+        self.temp = temp
 
 class Deployment(Event):
     '''
@@ -310,7 +318,7 @@ class Deployment(Event):
     # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
-class RSC_TR:
+class RSC_TR(RSC):
     pass
 
 
@@ -351,6 +359,7 @@ class Modulet:
         self.status = None
         self.kind = None
         self.project = None
+        self.temp = None
         self.result_eval = False
         self.log = {}
 
@@ -376,18 +385,7 @@ class Modulet:
         # gromadzenie logu czas: ilość moduletów w danym statusie - \
         # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 
-class GEN(type):
-    '''klasa do tworzenia inastancji klasy Modulet (modul testowy'''
-    def __new__(cls, name, dct={}):
-        '''
-        Zwraca instanje klasy Modulet na returnie
-        :param name: nazwa instancji
-        :param dct: argumenty jakie ma przyjac instancja - domyslnie brak
-        :return: Obiekt klasy Modulet
-        '''
-        base = Modulet
-        return type.__new__(cls, name, (base, object), dct)
-    # TODO: zwracany obiekty jest klasy GEN a nie modulet
+
 def randoms_from_sum(number, *args):
 
     '''
