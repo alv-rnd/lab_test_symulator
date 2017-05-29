@@ -62,10 +62,6 @@ class Event:
         log = {module.time: ['transport', module]}
         module.add_to_log(log)
 
-    def run_event(self, module_qty):
-        #for i in module_qty:
-            # if
-        print('event niezdefiniowany')
 
 
 
@@ -116,9 +112,6 @@ class Transport(Event):
     def __init__(self, *args):
         super(Transport, self).__init__(*args)
 
-        # TODO: czy po Transport nie powinno być self?
-        # TODO: sprawdziłem powinn
-
     def run_event(self, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
@@ -136,34 +129,20 @@ class Transport(Event):
         if self.push_to.max_in == False:
             if module_qty == False:
                 while len(self.pull_from) > 0:
-                    print('max in = False & mod_qty = False')
                     run_Forest()
             else:
                 while len(self.pull_from) > 0 and module_qty > 0:
-                    print('max in = False & mod_qty = True')
                     run_Forest()
                     module_qty -= 1
         else:
             if module_qty == False:
                 while len(self.pull_from) > 0 and \
                     self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    print('max in = True & mod_qty = False')
                     run_Forest()
             else:
                 while len(self.pull_from) > 0 and module_qty > 0 and \
                     self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    print('max in = True & mod_qty = True')
                     run_Forest()
-
-
-
-            # najpierw log, potem add tak by w logu widniał czas poczatkowy
-
-
-    # wywoływana przez klase Menage co 24h/ilość transportów
-    # zmiana statusu
-
-    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
@@ -195,8 +174,41 @@ class Check_in(Event):
         # funkcja losujaca parametry testów
         pass
 
-    def run_event(self, module_qty=0):
-        pass
+    def run_event(self, module_qty=False):
+        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
+        # zaczynając od poczatku listy
+        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
+        # dla poszczegolnych eventów. W przypadku uzycia argumentu
+        # module_qty narzucony jest limit przenoszonych testów
+
+        def run_Forest():
+            t = self.pull_from.loaded.pop(0)
+
+            self.add_to_log(t)
+            self.push_to.load(t)
+            self.add_time(t)
+
+        if self.push_to.max_in == False:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0:
+                    #print('max in = False & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0:
+                    #print('max in = False & mod_qty = True')
+                    run_Forest()
+                    module_qty -= 1
+        else:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = True')
+                    run_Forest()
 
     # zwiekszenie czasu w modulet
     # zmiana statusu
@@ -212,7 +224,7 @@ class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
     def __init__(self):
         super(RSC_Store, self).__init__()
-        self.max_in = 1000
+
 
 class Conditioning(Event):
     '''
