@@ -50,9 +50,17 @@ class Time:
 class Event:
     def __init__(self, pull_from, push_to, event_time):
 
-        self.event_time = event_time
         self.pull_from = pull_from
         self.push_to = push_to
+        self.event_time = event_time
+
+    def add_time(self, module):
+        # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
+        module.add_time(self.event_time)
+
+    def add_to_log(self, module):
+        log = {module.time: ['transport', module]}
+        module.add_to_log(log)
 
     def run_event(self, module_qty):
         #for i in module_qty:
@@ -108,22 +116,16 @@ class Transport(Event):
 
         # TODO: czy po Transport nie powinno być self?
         # TODO: sprawdziłem powinn
-    def add_time(self, module):
-        # uzywana w run_event do zmiany czasu odwoluje sie do funkcji o tej samej nazwie w Modulet
-        module.add_time(self.event_time)
 
-    def add_to_log(self, module):
-        log = {module.time : ['transport', module]}
-        module.add_to_log(log)
-
-    def run_event(self, module_qty=0):
+    def run_event(self, *args):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        print(self.pull_from)
+        if not args:
+            #poprawic
         while len(self.pull_from) > module_qty and\
                 len(self.push_to.loaded) < self.push_to.max_in:
             t = self.pull_from.pop(0)
@@ -166,7 +168,15 @@ class Check_in(Event):
     w obrębie której nastepuje losowanie ratingów, in/out, , temperatur, cond_time i innych atrybutów skojarzonych z modułem
     zmiana statusu na 'x'
     '''
-    def __init__(self):
+    def __init__(self, *args):
+        super(Check_in, self).__init__(*args)
+
+    def gen_rand_testparam(self, test):
+        # funkcja losujaca parametry testów
+        pass
+
+    def run_event(self, module_qty=0):
+
 
     # zwiekszenie czasu w modulet
     # zmiana statusu
@@ -181,7 +191,7 @@ class Check_in(Event):
 class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
     def __init__(self):
-        super(RSC, self).__init__()
+        super(RSC_Store, self).__init__()
         self.max_in = 1000
 
 class Conditioning(Event):
@@ -254,7 +264,7 @@ class Modulet:
         self.time = time
         self.status = status
         self.kind = random.choice(self.ab_kind)
-        self.project = str(random.randint(0, projects))
+        self.project = str(self.kind) + '_00' + str(random.randint(0, projects))
         self.result_eval = False
         self.log = {}
 
