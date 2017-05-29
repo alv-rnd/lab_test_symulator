@@ -65,7 +65,7 @@ class Event:
     def run_event(self, module_qty):
         #for i in module_qty:
             # if
-        pass
+        print('event niezdefiniowany')
 
 
 
@@ -96,7 +96,9 @@ class RSC:
 
     def load(self, test):
         #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
-        if len(self.loaded) < self.max_in:
+        if self.max_in == False:
+            self.loaded.append(test)
+        elif len(self.loaded) < self.max_in:
             self.loaded.append(test)
         else:
             self.in_queue.append(test)
@@ -117,28 +119,46 @@ class Transport(Event):
         # TODO: czy po Transport nie powinno być self?
         # TODO: sprawdziłem powinn
 
-    def run_event(self, *args):
+    def run_event(self, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        if not args:
-            #poprawic
-        while len(self.pull_from) > module_qty and\
-                len(self.push_to.loaded) < self.push_to.max_in:
+        def run_Forest():
             t = self.pull_from.pop(0)
 
             self.add_to_log(t)
             self.push_to.load(t)
             self.add_time(t)
 
-            print(t.log)
+        if self.push_to.max_in == False:
+            if module_qty == False:
+                while len(self.pull_from) > 0:
+                    print('max in = False & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from) > 0 and module_qty > 0:
+                    print('max in = False & mod_qty = True')
+                    run_Forest()
+                    module_qty -= 1
+        else:
+            if module_qty == False:
+                while len(self.pull_from) > 0 and \
+                    self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    print('max in = True & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from) > 0 and module_qty > 0 and \
+                    self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    print('max in = True & mod_qty = True')
+                    run_Forest()
+
+
+
             # najpierw log, potem add tak by w logu widniał czas poczatkowy
 
-        print(self.pull_from)
-        print(self.push_to.loaded)
 
     # wywoływana przez klase Menage co 24h/ilość transportów
     # zmiana statusu
@@ -176,7 +196,7 @@ class Check_in(Event):
         pass
 
     def run_event(self, module_qty=0):
-
+        pass
 
     # zwiekszenie czasu w modulet
     # zmiana statusu
@@ -248,7 +268,7 @@ class Modulet:
     '''
     klasa w obrębie której będą bedą gromadzić się parametry uzyskiwane w poszczególnych etapach procesu.
     '''
-    ab_kind = 'dab pab sab kab ic'.split()
+    ab_kind = 'dab pab sab kab ic'.upper().split()
 
     def __init__(self, name, projects=4, time=0, status=0):
         """
@@ -355,3 +375,45 @@ def spread_from_sum(number, spread, *args):
 #######################################
 
 
+# #print(spread_from_sum(100, 20))
+# #print(randoms_from_sum(100, 20))
+#
+# import LTS
+#
+# def generate_test(qty, lst):
+#     # na potrzeby budowy programu
+#
+#     for i in range(qty):
+#         test_name = 'Test{}'.format(i+1)
+#
+#         lst.append(LTS.Modulet(test_name))
+#     else:
+#         test_name = None
+#
+# trumna = LTS.RSC_trunk()
+# print('Utworzono trumne o pojemnosci: ', trumna.max_in)
+#
+# prod = []
+# generate_test(10, prod)
+# print('wygenerowano 10 testów i dodano je do listy prod')
+# for test in prod:
+#     print(test.project)
+#
+# print('Utworzono obszar Storage')
+# Storage = LTS.RSC_Store()
+#
+# TransportAPA = LTS.Transport(prod, trumna, 60)
+# print('zdefiniowano Transport o czasie ', TransportAPA.event_time, 'minut\n',\
+#       'ktory obsluzy transport modulow z listy prod w kontenerze trumna')
+#
+# TransportAPA.run_event(10)
+# print('wywolanie transportuAPA')
+#
+# print('Check_in przed:')
+# print(trumna.loaded)
+# print(Storage.loaded)
+# Check_in_LAB = LTS.Check_in(trumna, Storage, 20)
+# # Check_in_LAB.run_event()
+# print('Check_in po:')
+# print(trumna.loaded)
+# print(Storage.loaded)
