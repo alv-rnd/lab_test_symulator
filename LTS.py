@@ -31,11 +31,76 @@ class Manage:
         print(self.init)
         general_time = Time()
 
-
     def set_max_in(self, rsc_name, new_val):
         # Funkcja - RSC - do zmian argumentu max_in
-        RSC_trunk(rsc_name).set_max_in(new_val)
+        # RSC_trunk(rsc_name).set_max_in(new_val)
+        pass
 
+    def rat_eval(self):
+
+        pass
+
+    # podglad modułów w danym zabie
+    def spotX_on_RSC_loaded(self, x, rsc, from_end=False):
+        # obecnie trzeba zapodać na selfie LTS.Manage(10)
+        # Nie trzeba dawać 10. Można dać 2. Lub 3. Lub 7. Cokolwiek
+        if len(rsc.loaded) == 0: print('Brak modułów w podanym zasobie')
+        if from_end:
+            if len(rsc.loaded) > x:
+                for i in range(x):
+                    print(rsc.loaded[i].name, rsc.loaded[i].type,
+                          rsc.loaded[i].project, rsc.loaded[i].temp)
+            elif len(rsc.loaded) > 0:
+                for i in range(len(rsc.loaded)):
+                    print(rsc.loaded[i].name, rsc.loaded[i].type,
+                          rsc.loaded[i].project, rsc.loaded[i].temp)
+        else:
+            if len(rsc.loaded) > x:
+                for i in range(x):
+                    print(rsc.loaded[-i].name, rsc.loaded[-i].type,
+                          rsc.loaded[-i].project, rsc.loaded[-i].temp)
+            elif len(rsc.loaded) > 0:
+                for i in range(len(rsc.loaded)):
+                    print(rsc.loaded[-i].name, rsc.loaded[-i].type,
+                          rsc.loaded[-i].project, rsc.loaded[-i].temp)
+        # ahh, jakaż okazja by to przerobić na generatorek
+
+
+    # generatorki do obrobienia jeszcze - moze sie przyda:
+    def gen_ALL_RSCs(self, t_qty, test_list, tc_qty, tc_cap):
+        # self.gen_Trunk()
+        # self.gen_Tests(t_qty, test_list)
+        # self.gen_Storage()
+        # self.gen_TCs(tc_qty, tc_cap)
+        # #cdn
+    def gen_Trunk(self):
+        pass
+        # trumna = LTS.RSC_trunk()
+        # return trumna
+    def gen_Tests(self, qty, test_list):
+        pass
+        # for i in range(qty):
+        #     test_name = 'Test{}'.format(i + 1)
+        #     test_list.append(Modulet(test_name))
+        # return test_list
+        # print('Dodano(utworzono)', qty, 'testów do "test_list"y'
+    def gen_Storage(self):
+        pass
+        # Storage = RSC_Store()
+        # return Storage
+        # print('Utworzono strefe 'Storage', wielką i nieskończoną. Na horyzoncie widać Mordor
+    def gen_TCs(self, qty, cap):
+        pass
+        # tc_list = []
+        # for i in qty:  # robimy komory
+        #     tc = 'TC_{}'.format(i)
+        #     temps = [-35, 85]
+        #     tc_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
+        #         # zwraca zawsze 0 lub 1 o ile sie nie jebnałem, bo kótka
+        #         # lista temps i dla wiekszej iloci komor nie chciałem komplikowac
+        #         # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
+        #     tc_list[-1].set_max_in(cap)
+        # print('Utworzono komory TC_1 do TC_%s' s=cap)
 
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
@@ -220,14 +285,18 @@ class Check_in(Event):
     def set_project_qty(self, qty):
         self.project_qty = qty
 
+
+
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
         test.project = random.randint(1, self.project_qty + 1)
         test.type = random.choice(Modulet.ab_kind)
+        test.temp = random.choice([-35, 23, 85])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
-        if str(test.project) in Manage.ratings.keys():
-            print('kupa')
-        else: test.temp = random.choice([-35, 23, 85])
+        # if str(test.project) in Manage.ratings.keys():
+        #     print('kupa')
+        #     # TODO: OBSŁUŻYĆ KUPSZTALA
+        # else: test.temp = random.choice([-35, 23, 85])
 
     def run_event(self, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
@@ -304,6 +373,9 @@ class RSC_TC(RSC):
         super(RSC_TC, self).__init__()
     def set_temp(self, temp):
         self.temp = temp
+    def set_name(self, name):
+        self.name = name
+
 
 class Deployment(Event):
     '''
