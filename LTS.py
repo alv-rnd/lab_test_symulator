@@ -46,7 +46,7 @@ class Manage:
             day_time = 24
         q = day_time / transport_qty
         return q
-
+ #
     # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
     # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
 
