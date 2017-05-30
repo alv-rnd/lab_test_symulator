@@ -11,9 +11,9 @@ class Manage:
     Klasa zarządzająca wszytkim
     '''
     init = False
-    ratings = {'1': [[1, 2, 1], [0, 0, 0]],
-               '2': [[1, 1, 1], [0, 0, 0]],
-               '3': [[2, 1, 1], [0, 0, 0]]}
+    # ratings = {'1': [[1, 2, 1], [0, 0, 0]],
+    #            '2': [[1, 1, 1], [0, 0, 0]],
+    #            '3': [[2, 1, 1], [0, 0, 0]]}
     # Lista zdarzeń do sprawdzenia kolejnego zdarzenia ktore
     # mozna wykonac: petla while (np) leci po kazdym dodanym resourcie
     # i spr rsc.in_queue lub .loaded (jedno z dwojga zaleznie od podejsia)
@@ -64,39 +64,36 @@ class Manage:
 
     # generatorki do obrobienia jeszcze - moze sie przyda:
     def gen_ALL_RSCs(self, t_qty, test_list, tc_qty, tc_cap):
-        # self.gen_Trunk()
-        # self.gen_Tests(t_qty, test_list)
-        # self.gen_Storage()
-        # self.gen_TCs(tc_qty, tc_cap)
-        # #cdn
+        self.gen_Trunk()
+        self.gen_Tests(t_qty, test_list)
+        self.gen_Storage()
+        self.gen_TCs(tc_qty, tc_cap)
+        #cdn
     def gen_Trunk(self):
-        pass
-        # trumna = LTS.RSC_trunk()
-        # return trumna
+        trumna = RSC_trunk()
+        return trumna
     def gen_Tests(self, qty, test_list):
-        pass
-        # for i in range(qty):
-        #     test_name = 'Test{}'.format(i + 1)
-        #     test_list.append(Modulet(test_name))
-        # return test_list
-        # print('Dodano(utworzono)', qty, 'testów do "test_list"y'
+        for i in range(qty):
+            test_name = 'Test{}'.format(i + 1)
+            test_list.append(Modulet(test_name))
+        print('Dodano(utworzono)', qty, 'testów do \'test_list\'y')
+        return test_list
     def gen_Storage(self):
-        pass
-        # Storage = RSC_Store()
-        # return Storage
-        # print('Utworzono strefe 'Storage', wielką i nieskończoną. Na horyzoncie widać Mordor
+        Storage = RSC_Store()
+        print('Utworzono strefe ', Storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
+        return Storage
+
     def gen_TCs(self, qty, cap):
-        pass
-        # tc_list = []
-        # for i in qty:  # robimy komory
-        #     tc = 'TC_{}'.format(i)
-        #     temps = [-35, 85]
-        #     tc_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
-        #         # zwraca zawsze 0 lub 1 o ile sie nie jebnałem, bo kótka
-        #         # lista temps i dla wiekszej iloci komor nie chciałem komplikowac
-        #         # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
-        #     tc_list[-1].set_max_in(cap)
-        # print('Utworzono komory TC_1 do TC_%s' s=cap)
+        tc_list = []
+        for i in qty:  # robimy komory
+            tc = 'TC_{}'.format(i)
+            temps = [-35, 85]
+            tc_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
+                # zwraca zawsze 0 lub 1 o ile sie nie jebnałem, bo kótka
+                # lista temps i dla wiekszej iloci komor nie chciałem komplikowac
+                # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
+            tc_list[-1].set_max_in(cap)
+        print('Utworzono komory TC_1 do TC_%s' %(cap))
 
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
