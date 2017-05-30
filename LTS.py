@@ -21,14 +21,16 @@ class Manage:
     # event - albo zupełnie inaczej - np. eventy wyzwalaja
     # sasiadujce eventy miedzy soba z automatu, albo
     # roznie w zależności od rodzju procesu
-    def __init__(self, t_qty, tc_qty, tc_cap, ):
+    def __init__(self, t_qty, tc_qty, tc_cap, frq_check_in):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
+        self.frq_check_in = frq_check_in
         self.test_list = []
         self.other_RSC =[]
         self.TC_list = []
         self.TR_list = []
+        self.ready_list = {}
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
@@ -51,11 +53,11 @@ class Manage:
     # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
     # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
 
-    def sim_run(self, prepare_tests=True):
-        if prepare_tests == True:
+    def sim_run(self, first_run=True):
+        if first_run == True:
             # Tworzenie testów zapełniających komory (czy komory też mają być wtedy tworzone????)
             # przed rozpoczęciem symulacji i zmiana parametru na False.
-            prepare_tests = False
+            first_run = False
 
         while self.init:
             #brak przypisania do zmiennej "check" bo po wejściu w while'a check bedzie miał
@@ -67,7 +69,11 @@ class Manage:
                 Transport(self.test_list, self.other_RSC[0], 120) # czas transportu docelowo z Kivy???? chyba
                 #rozładunek możey być robiony po pierwszym while'u, jeszcze nie wiem jak ale tak :D
                 Check_in(self.other_RSC[0], self.other_RSC[1], 30) # i tu też czas z Kivy???
-            if self.real_time.check_time() %
+            if self.real_time.check_time() % self.frq_check_in == 0:
+                Conditioning(self.other_RSC[1], self.TC_list, 240) # brak parametru "first_run" bo nie ma go w Event
+            if len(self.ready_list) > 0: # kiedy będą wrzucane moduły do ready_list? jaki warunek (interwał czasowy) bedzie to obsługiwał
+                                         #czy tak jak pisałeś jakiś static metod? czy
+                pass # nie dużo zrobiłem ale pasuje bo juz nie ogasrniam :D
 
         # tmin = 0 #jakiś przykładowy czas w min
         # transport_qty_per_day = 3 #zgadnij
