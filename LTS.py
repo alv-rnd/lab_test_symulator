@@ -21,9 +21,12 @@ class Manage:
     # event - albo zupełnie inaczej - np. eventy wyzwalaja
     # sasiadujce eventy miedzy soba z automatu, albo
     # roznie w zależności od rodzju procesu
-    def __init__(self, module_qty):
-        self.module_qty = module_qty
+    def __init__(self):
         print(self.init)
+        self.test_list = []
+
+        self.TC_list = []
+        self.TR_list = []
 
     def sim_run(self):
         first_run = Transport()
@@ -63,21 +66,21 @@ class Manage:
 
 
     # generatorki do obrobienia jeszcze - moze sie przyda:
-    def gen_ALL_RSCs(self, t_qty, test_list, tc_qty, tc_cap):
+    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap):
         self.gen_Trunk()
-        self.gen_Tests(t_qty, test_list)
+        self.gen_Tests(t_qty)
         self.gen_Storage()
         self.gen_TCs(tc_qty, tc_cap)
         #cdn
     def gen_Trunk(self):
         trumna = RSC_trunk()
         return trumna
-    def gen_Tests(self, qty, test_list):
+    def gen_Tests(self, qty):
         for i in range(qty):
             test_name = 'Test{}'.format(i + 1)
-            test_list.append(Modulet(test_name))
+            self.test_list.append(Modulet(test_name))
         print('Dodano(utworzono)', qty, 'testów do \'test_list\'y')
-        return test_list
+        return self.test_list
     def gen_Storage(self):
         Storage = RSC_Store()
         print('Utworzono strefe ', Storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
@@ -85,7 +88,7 @@ class Manage:
 
     def gen_TCs(self, qty, cap):
         tc_list = []
-        for i in qty:  # robimy komory
+        for i in range(qty):  # robimy komory
             tc = 'TC_{}'.format(i)
             temps = [-35, 85]
             tc_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
@@ -93,7 +96,7 @@ class Manage:
                 # lista temps i dla wiekszej iloci komor nie chciałem komplikowac
                 # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
             tc_list[-1].set_max_in(cap)
-        print('Utworzono komory TC_1 do TC_%s' %(cap))
+        print('Utworzono komory TC_1 do TC_%s' %(qty))
 
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
