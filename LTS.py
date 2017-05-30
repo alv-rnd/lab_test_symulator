@@ -10,7 +10,6 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-    init = False
     # ratings = {'1': [[1, 2, 1], [0, 0, 0]],
     #            '2': [[1, 1, 1], [0, 0, 0]],
     #            '3': [[2, 1, 1], [0, 0, 0]]}
@@ -21,17 +20,17 @@ class Manage:
     # event - albo zupełnie inaczej - np. eventy wyzwalaja
     # sasiadujce eventy miedzy soba z automatu, albo
     # roznie w zależności od rodzju procesu
-    def __init__(self):
-        print(self.init)
+    def __init__(self, t_qty, tc_qty, tc_cap):
+        self.t_qty = t_qty
+        self.tc_qty = tc_qty
+        self.tc_cap = tc_cap
         self.test_list = []
         self.other_RSC =[]
         self.TC_list = []
         self.TR_list = []
+        self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
 
     def sim_run(self):
-        first_run = Transport()
-        self.init = True
-        print(self.init)
         general_time = Time()
 
     def set_max_in(self, rsc_name, new_val):
@@ -39,7 +38,7 @@ class Manage:
         # RSC_trunk(rsc_name).set_max_in(new_val)
         pass
 
-    # podglad modułów w danym zabie
+    # podglad modułów w danym zasobie RSC
     def spotX_on_RSC_loaded(self, x, rsc, from_end=False):
         # obecnie trzeba zapodać na selfie LTS.Manage(10)
         # Nie trzeba dawać 10. Można dać 2. Lub 3. Lub 7. Cokolwiek
@@ -72,16 +71,19 @@ class Manage:
         self.gen_Storage()
         self.gen_TCs(tc_qty, tc_cap)
         #cdn
+
     def gen_Trunk(self):
         trumna = RSC_trunk()
         self.other_RSC.append(trumna)
         return None
+
     def gen_Tests(self, qty):
         for i in range(qty):
             test_name = 'Test{}'.format(i + 1)
             self.test_list.append(Modulet(test_name))
         print('Dodano(utworzono)', qty, 'testów do \'test_list\'y')
         return self.test_list
+
     def gen_Storage(self):
         Storage = RSC_Store()
         self.other_RSC.append(Storage)
@@ -99,6 +101,7 @@ class Manage:
             self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
 
+
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
     def __init__(self, time_format='min', value=None):
@@ -109,7 +112,6 @@ class Time:
     def add_time_module(self, modulet):
         self.modulet = modulet
 
-
     def add_real_time(self):
         pass
         # current_general_time = self.time_init +
@@ -117,7 +119,6 @@ class Time:
     def make_log(self):
         pass
         #log = pd
-
 
 
 class Event:
