@@ -51,7 +51,7 @@ class Manage:
         #         Transport(self.test_list, trumnaAPA, 60) # a rozładunek?
         #         Check_in(trumnaAPA, storageLAB, 20)
         #     if tmin%120 == 0: # co 2h wrzucamy do kondycjonowania
-        #         Conditioning(storageLAB, self.TC_list, 240)
+        #         Conditioning(storageLAB, self.TC_list, 240, first_run=False(by default))
         #     if len(rdy_lst) > 0: # moe rdy zapisac w postaci jakiegos
         #         # static method czy param? coby sie spr z kazda iteracja czasu
         #         for TR in self.TR_list:
