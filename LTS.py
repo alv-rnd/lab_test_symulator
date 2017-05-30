@@ -7,7 +7,7 @@ import os
 
 
 class Manage:
-    init = False
+    init = True
     '''
     Klasa zarządzająca wszytkim
     '''
@@ -32,11 +32,41 @@ class Manage:
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
-        def sim_run(self):
-        check = self.real_time.check_time()
-        self.init = True
+    @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym
+    def transport_qty(transport_qty, approach=True):
+        """
+        Normalnie transporty są tylko w ciągu dnia czyli 12 godzin, ale kto wie co przyniesie przyszłość :D
+        :param transport_qty: ilośc transportów
+        :param approach: domyślnie 12 godzin, bo tak mamy ale zawsze można przyjąć 24h (checkbox w Kivy)
+        :return: ilość transportów
+        """
+        if approach == True:
+            day_time = 12
+        else:
+            day_time = 24
+        q = day_time / transport_qty
+        return q
+
+    # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
+    # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
+
+    def sim_run(self, prepare_tests=True):
+        if prepare_tests == True:
+            # Tworzenie testów zapełniających komory (czy komory też mają być wtedy tworzone????)
+            # przed rozpoczęciem symulacji i zmiana parametru na False.
+            prepare_tests = False
+
         while self.init:
-            # if check == 0 or check %
+            #brak przypisania do zmiennej "check" bo po wejściu w while'a check bedzie miał
+            # zawsze początkową wartość == 0 (tak mi na ten moment wydaje :D)
+            if self.real_time.check_time() == 0 or self.real_time.check_time() % Manage.transport_qty(3) == 0:
+                # nie przyjmuje żadnych rodzajów czasu, to robi klasa Time w __inint__ Manage, domyślnie jest min
+
+                # gen.test() co to było??
+                Transport(self.test_list, self.other_RSC[0], 120) # czas transportu docelowo z Kivy???? chyba
+                #rozładunek możey być robiony po pierwszym while'u, jeszcze nie wiem jak ale tak :D
+                Check_in(self.other_RSC[0], self.other_RSC[1], 30) # i tu też czas z Kivy???
+
 
         # tmin = 0 #jakiś przykładowy czas w min
         # transport_qty_per_day = 3 #zgadnij
