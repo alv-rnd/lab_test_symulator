@@ -7,6 +7,7 @@ import os
 
 
 class Manage:
+    init = False
     '''
     Klasa zarządzająca wszytkim
     '''
@@ -29,14 +30,19 @@ class Manage:
         self.TC_list = []
         self.TR_list = []
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
+        self.real_time = Time()
 
     def sim_run(self):
-        general_time = Time()
+        check = self.real_time.check_time()
+        self.init = True
+        while self.init:
+            if check == 0 or check %
+
 
     def set_max_in(self, rsc_name, new_val):
-        # Funkcja - RSC - do zmian argumentu max_in
-        # RSC_trunk(rsc_name).set_max_in(new_val)
+        # Funkcja - RSC - do zmian argumentu max_in(new_val)
         pass
+        # RSC_trunk(rsc_name).set_max_in
 
     # podglad modułów w danym zasobie RSC
     def spotX_on_RSC_loaded(self, x, rsc, from_end=False):
@@ -108,12 +114,13 @@ class Time:
         self.time_format = time_format
         self.value = value
         self.time_init = 0
+        self.real_time = 0
 
     def add_time_module(self, modulet):
         self.modulet = modulet
 
-    def add_real_time(self):
-        pass
+    def check_time(self):
+        return self.real_time
         # current_general_time = self.time_init +
 
     def make_log(self):
