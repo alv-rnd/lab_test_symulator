@@ -36,7 +36,7 @@ class Manage:
         check = self.real_time.check_time()
         self.init = True
         while self.init:
-            if check == 0 or check %
+            # if check == 0 or check %
 
 
     def set_max_in(self, rsc_name, new_val):
@@ -360,6 +360,11 @@ class Conditioning(Event):
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
     '''
+    # for TC in TC_list:
+    #     if TC.loaded < TC.max_in:
+    #         for test in S.loaded:
+    #             if test.temp == TC.temp:
+    #                 TC.load(test)
     pass
     # zwiekszenie czasu w modulet
     # zmiana statusu
