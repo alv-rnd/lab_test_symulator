@@ -46,21 +46,22 @@ class Manage:
         if from_end:
             if len(rsc.loaded) > x:
                 for i in range(x):
-                    print(rsc.loaded[i].name, rsc.loaded[i].type,
+                    print(rsc.loaded[i].name, rsc.loaded[i].kind,
                           rsc.loaded[i].project, rsc.loaded[i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
-                    print(rsc.loaded[i].name, rsc.loaded[i].type,
+                    print(rsc.loaded[i].name, rsc.loaded[i].kind,
                           rsc.loaded[i].project, rsc.loaded[i].temp)
         else:
             if len(rsc.loaded) > x:
                 for i in range(x):
-                    print(rsc.loaded[-i].name, rsc.loaded[-i].type,
+                    print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
                           rsc.loaded[-i].project, rsc.loaded[-i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
-                    print(rsc.loaded[-i].name, rsc.loaded[-i].type,
+                    print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
                           rsc.loaded[-i].project, rsc.loaded[-i].temp)
+        return None
         # ahh, jakaż okazja by to przerobić na generatorek
 
 
@@ -245,12 +246,10 @@ class Transport(Event):
                     module_qty -= 1
         else:
             if module_qty == False:
-                while len(self.pull_from) > 0 and \
-                    self.push_to.max_in - len(self.push_to.loaded) > 0:
+                while len(self.pull_from) > 0 and self.push_to.max_in - len(self.push_to.loaded) > 0:
                     run_Forest()
             else:
-                while len(self.pull_from) > 0 and module_qty > 0 and \
-                    self.push_to.max_in - len(self.push_to.loaded) > 0:
+                while len(self.pull_from) > 0 and module_qty > 0 and self.push_to.max_in - len(self.push_to.loaded) > 0:
                     run_Forest()
 
 class RSC_trunk(RSC):
@@ -288,7 +287,7 @@ class Check_in(Event):
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
         test.project = random.randint(1, self.project_qty + 1)
-        test.type = random.choice(Modulet.ab_kind)
+        test.kind = random.choice(Modulet.ab_kind)
         test.temp = random.choice([-35, 23, 85])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
         # if str(test.project) in Manage.ratings.keys():
@@ -509,45 +508,18 @@ def spread_from_sum(number, spread, *args):
 #######################################
 
 
-# #print(spread_from_sum(100, 20))
-# #print(randoms_from_sum(100, 20))
-#
 # import LTS
+# mng = LTS.Manage(10, 3, 8)
 #
-# def generate_test(qty, lst):
-#     # na potrzeby budowy programu
+# Trumna = mng.other_RSC[0]
+# Storage = mng.other_RSC[1]
 #
-#     for i in range(qty):
-#         test_name = 'Test{}'.format(i+1)
+# # print(mng.test_list, '\n\n',
+# #       mng.other_RSC, '\n\n',
+# #       mng.TC_list, '\n\n',
+# #       mng.TR_list)
 #
-#         lst.append(LTS.Modulet(test_name))
-#     else:
-#         test_name = None
-#
-# trumna = LTS.RSC_trunk()
-# print('Utworzono trumne o pojemnosci: ', trumna.max_in)
-#
-# prod = []
-# generate_test(10, prod)
-# print('wygenerowano 10 testów i dodano je do listy prod')
-# for test in prod:
-#     print(test.project)
-#
-# print('Utworzono obszar Storage')
-# Storage = LTS.RSC_Store()
-#
-# TransportAPA = LTS.Transport(prod, trumna, 60)
-# print('zdefiniowano Transport o czasie ', TransportAPA.event_time, 'minut\n',\
-#       'ktory obsluzy transport modulow z listy prod w kontenerze trumna')
-#
-# TransportAPA.run_event(10)
-# print('wywolanie transportuAPA')
-#
-# print('Check_in przed:')
-# print(trumna.loaded)
-# print(Storage.loaded)
-# Check_in_LAB = LTS.Check_in(trumna, Storage, 20)
-# # Check_in_LAB.run_event()
-# print('Check_in po:')
-# print(trumna.loaded)
-# print(Storage.loaded)
+# LTS.Transport(mng.test_list, Trumna, 60).run_event()
+# LTS.Manage.spotX_on_RSC_loaded(mng, 2, Trumna, True)
+# LTS.Check_in(Trumna, Storage, 20).run_event()
+# LTS.Manage.spotX_on_RSC_loaded(mng, 2, Storage, True)
