@@ -32,11 +32,39 @@ class Manage:
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
-    def sim_run(self):
+        def sim_run(self):
         check = self.real_time.check_time()
         self.init = True
         while self.init:
             # if check == 0 or check %
+
+        # tmin = 0 #jakiś przykładowy czas w min
+        # transport_qty_per_day = 3 #zgadnij
+        # m = 24/transport_qty_per_day #do modulo w ifie ponizej
+        #
+        # trumnaAPA = self.other_RSC[0] # porawić couner gdyby zmienić kolejność tworzeni instancji w gen
+        # storageLAB = self.other_RSC[1] # to też
+        #
+        # while True:
+        #     if tmin == 0 or tmin%m == 0:
+        #         self.gen_Tests(self.t_qty)
+        #         Transport(self.test_list, trumnaAPA, 60) # a rozładunek?
+        #         Check_in(trumnaAPA, storageLAB, 20)
+        #     if tmin%120 == 0: # co 2h wrzucamy do kondycjonowania
+        #         Conditioning(storageLAB, self.TC_list, 240)
+        #     if len(rdy_lst) > 0: # moe rdy zapisac w postaci jakiegos
+        #         # static method czy param? coby sie spr z kazda iteracja czasu
+        #         for TR in self.TR_list:
+        #             # tu jakiś ifik spr x pierwszych testów z rdy
+        #             # i jeśli jest ten sam proj to go bierze a nie to pierwszy z brzegu
+        #             # czy cuś w ten deseń
+        #             for test in rdy_lst:
+        #                 Deployment(rdy_lst, self.TR_list, 20)
+        #             for tr in self.TR_list:
+        #                 for test in tr.loaded:
+        #                     if tmin >= test.time:
+        #                         Analysis(tr.loaded, self.finished)
+        #     tmin += 1
 
 
     def set_max_in(self, rsc_name, new_val):
