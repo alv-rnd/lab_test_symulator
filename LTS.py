@@ -36,10 +36,6 @@ class Manage:
         # RSC_trunk(rsc_name).set_max_in(new_val)
         pass
 
-    def rat_eval(self):
-
-        pass
-
     # podglad modułów w danym zabie
     def spotX_on_RSC_loaded(self, x, rsc, from_end=False):
         # obecnie trzeba zapodać na selfie LTS.Manage(10)
