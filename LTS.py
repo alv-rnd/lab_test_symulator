@@ -24,7 +24,7 @@ class Manage:
     def __init__(self):
         print(self.init)
         self.test_list = []
-
+        self.other_RSC =[]
         self.TC_list = []
         self.TR_list = []
 
@@ -74,7 +74,8 @@ class Manage:
         #cdn
     def gen_Trunk(self):
         trumna = RSC_trunk()
-        return trumna
+        self.other_RSC.append(trumna)
+        return None
     def gen_Tests(self, qty):
         for i in range(qty):
             test_name = 'Test{}'.format(i + 1)
@@ -83,19 +84,19 @@ class Manage:
         return self.test_list
     def gen_Storage(self):
         Storage = RSC_Store()
+        self.other_RSC.append(Storage)
         print('Utworzono strefe ', Storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
-        return Storage
+        return None
 
     def gen_TCs(self, qty, cap):
-        tc_list = []
         for i in range(qty):  # robimy komory
             tc = 'TC_{}'.format(i)
             temps = [-35, 85]
-            tc_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
+            self.TC_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
                 # zwraca zawsze 0 lub 1 o ile sie nie jebnałem, bo kótka
                 # lista temps i dla wiekszej iloci komor nie chciałem komplikowac
                 # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
-            tc_list[-1].set_max_in(cap)
+            self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
 
 class Time:
