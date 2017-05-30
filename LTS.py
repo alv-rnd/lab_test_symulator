@@ -21,7 +21,7 @@ class Manage:
     # event - albo zupełnie inaczej - np. eventy wyzwalaja
     # sasiadujce eventy miedzy soba z automatu, albo
     # roznie w zależności od rodzju procesu
-    def __init__(self, t_qty, tc_qty, tc_cap):
+    def __init__(self, t_qty, tc_qty, tc_cap, ):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
@@ -32,7 +32,7 @@ class Manage:
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
-    @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym
+    @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym, może być na około
     def transport_qty(transport_qty, approach=True):
         """
         Normalnie transporty są tylko w ciągu dnia czyli 12 godzin, ale kto wie co przyniesie przyszłość :D
@@ -46,7 +46,8 @@ class Manage:
             day_time = 24
         q = day_time / transport_qty
         return q
- #
+ #TODO: nie wiem czy transport_qty powinno być pobierane bezpośrednio z Kivy czy najpier w __init__ i dopiero self.transport_qty w staticmetod
+
     # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
     # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
 
@@ -66,7 +67,7 @@ class Manage:
                 Transport(self.test_list, self.other_RSC[0], 120) # czas transportu docelowo z Kivy???? chyba
                 #rozładunek możey być robiony po pierwszym while'u, jeszcze nie wiem jak ale tak :D
                 Check_in(self.other_RSC[0], self.other_RSC[1], 30) # i tu też czas z Kivy???
-
+            if self.real_time.check_time() %
 
         # tmin = 0 #jakiś przykładowy czas w min
         # transport_qty_per_day = 3 #zgadnij
