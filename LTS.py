@@ -124,20 +124,24 @@ class Manage:
             if len(rsc.loaded) > x:
                 for i in range(x):
                     print(rsc.loaded[i].name, rsc.loaded[i].kind,
-                          rsc.loaded[i].project, rsc.loaded[i].temp)
+                          rsc.loaded[i].project,
+                          rsc.loaded[i].status, rsc.loaded[i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
                     print(rsc.loaded[i].name, rsc.loaded[i].kind,
-                          rsc.loaded[i].project, rsc.loaded[i].temp)
+                          rsc.loaded[i].project,
+                          rsc.loaded[i].status, rsc.loaded[i].temp)
         else:
             if len(rsc.loaded) > x:
                 for i in range(x):
                     print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
-                          rsc.loaded[-i].project, rsc.loaded[-i].temp)
+                          rsc.loaded[-i].project,
+                          rsc.loaded[-i].status, rsc.loaded[-i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
                     print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
-                          rsc.loaded[-i].project, rsc.loaded[-i].temp)
+                          rsc.loaded[-i].project,
+                          rsc.loaded[-i].status, rsc.loaded[-i].temp)
         return None
         # ahh, jakaż okazja by to przerobić na generatorek
 
@@ -170,6 +174,8 @@ class Manage:
         return None
 
     def gen_TCs(self, qty, cap):
+        self.TC_list.append(RSC_TC('TC_RT', 23))
+        print(self.TC_list[-1].max_in)
         for i in range(qty):  # robimy komory
             tc = 'TC_{}'.format(i)
             temps = [-35, 85]
@@ -434,12 +440,48 @@ class Conditioning(Event):
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
     '''
-    # for TC in TC_list:
-    #     if TC.loaded < TC.max_in:
-    #         for test in S.loaded:
-    #             if test.temp == TC.temp:
-    #                 TC.load(test)
-    pass
+    def run_event(self, module_qty=False):
+        TC_list = self.push_to
+        for TC in TC_list:
+            if TC.loaded < TC.max_in:
+                for test in S.loaded:
+                    if test.temp == TC.temp:
+                        TC.load(test)
+    def run_event(self, module_qty=False):
+        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
+        # zaczynając od poczatku listy
+        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
+        # dla poszczegolnych eventów. W przypadku uzycia argumentu
+        # module_qty narzucony jest limit przenoszonych testów
+
+        def run_Forest():
+            t = self.pull_from.loaded.pop(0)
+
+            self.add_to_log(t)
+            self.push_to.load(t)
+            self.add_time(t)
+
+        if self.push_to.max_in == False:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0:
+                    #print('max in = False & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0:
+                    #print('max in = False & mod_qty = True')
+                    run_Forest()
+                    module_qty -= 1
+        else:
+            if module_qty == False:
+                while len(self.pull_from.loaded) > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = False')
+                    run_Forest()
+            else:
+                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
+                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+                    #print('max in = True & mod_qty = True')
+                    run_Forest()
     # zwiekszenie czasu w modulet
     # zmiana statusu
 
