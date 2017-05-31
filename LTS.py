@@ -90,6 +90,10 @@ class Manage:
         #         Check_in(trumnaAPA, storageLAB, 20)
         #     if tmin%120 == 0: # co 2h wrzucamy do kondycjonowania
         #         Conditioning(storageLAB, self.TC_list, 240, first_run=False(by default))
+#             for tr in self.TR_list:
+#                 for test in tr.loaded:
+#                     if tmin >= test.time:
+#                         Analysis(tr.loaded, self.finished)
         #     if len(rdy_lst) > 0: # moe rdy zapisac w postaci jakiegos
         #         # static method czy param? coby sie spr z kazda iteracja czasu
         #         for TR in self.TR_list:
@@ -98,10 +102,6 @@ class Manage:
         #             # czy cuś w ten deseń
         #             for test in rdy_lst:
         #                 Deployment(rdy_lst, self.TR_list, 20)
-#             for tr in self.TR_list:
-#                 for test in tr.loaded:
-#                     if tmin >= test.time:
-#                         Analysis(tr, self.finished)
         #     tmin += 1
 
 
@@ -138,7 +138,7 @@ class Manage:
 
 
     # generatorki do obrobienia jeszcze - moze sie przyda:
-    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap, at_qty):
+    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap):
         self.gen_Trunk()
         self.gen_Tests(t_qty)
         self.gen_Storage()
@@ -365,6 +365,7 @@ class Check_in(Event):
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
         test.project = random.randint(1, self.project_qty + 1)
+        # losowanie in/out -> modulet
         test.kind = random.choice(Modulet.ab_kind)
         test.temp = random.choice([-35, 23, 85])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
@@ -410,15 +411,6 @@ class Check_in(Event):
                     # print('max in = True & mod_qty = True')
                     run_Forest()
 
-    # zwiekszenie czasu w modulet
-    # zmiana statusu
-    # losowanie ratingów -> modulet
-    # losowanie temp -> modulet
-    # losowanie cond_time -> modulet
-    # losowanie in/out -> modulet
-    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
-    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
-
 
 class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
@@ -438,7 +430,7 @@ class Conditioning(Event):
                 for test in S.loaded:
                     if test.temp == TC.temp:
                         TC.load(test)
-    def run_event(self, module_qty=False):
+
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
@@ -473,11 +465,6 @@ class Conditioning(Event):
                                         self.push_to.max_in - len(self.push_to.loaded) > 0:
                     #print('max in = True & mod_qty = True')
                     run_Forest()
-    # zwiekszenie czasu w modulet
-    # zmiana statusu
-
-    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, czasu trwania etapu itp
-    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
 class RSC_TC(RSC):
@@ -499,11 +486,6 @@ class Deployment(Event):
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
     pass
-    # zwiekszenie czasu w modulet
-    # zmiana statusu
-
-    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
-    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
 class RSC_TR(RSC):
@@ -515,11 +497,6 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
     pass
-    # zwiekszenie czasu w modulet
-    # zmiana statusu
-    # dodanie oceny
-    # dodanie w logu modulet (słownik?) par czas/godzina : lista statusu, oceny, czasu trwania etapu itp
-    # capacity/zdolność/wydolność danego obszaru/etapu/kroku oraz kolejki???
 
 
 class RSC_Analysis:
@@ -560,18 +537,6 @@ class Modulet:
 
     def add_to_log(self, test_ev):
         self.log.update(test_ev)
-
-
-
-        # dodać w inicie param log - pusty słownik
-        # gromadzenie logu czas: ilość moduletów w danym statusie - \
-        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
-
-    # ### Funkcje: ###
-
-        # dodać w inicie param log - pusty słownik
-        # gromadzenie logu czas: ilość moduletów w danym statusie - \
-        # - ekspozycja wąskiego gardła - ewentualnie można sie bawić z df i podstawowym logiem
 
 
 def randoms_from_sum(number, *args):
