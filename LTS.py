@@ -115,23 +115,23 @@ class Manage:
             if len(rsc.loaded) > x:
                 for i in range(x):
                     print(rsc.loaded[i].name, rsc.loaded[i].kind,
-                          rsc.loaded[i].project,
+                          rsc.loaded[i].project, rsc.loaded[i].time,
                           rsc.loaded[i].status, rsc.loaded[i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
                     print(rsc.loaded[i].name, rsc.loaded[i].kind,
-                          rsc.loaded[i].project,
+                          rsc.loaded[i].project, rsc.loaded[i].time,
                           rsc.loaded[i].status, rsc.loaded[i].temp)
         else:
             if len(rsc.loaded) > x:
                 for i in range(x):
                     print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
-                          rsc.loaded[-i].project,
+                          rsc.loaded[-i].project, rsc.loaded[-i].time,
                           rsc.loaded[-i].status, rsc.loaded[-i].temp)
             elif len(rsc.loaded) > 0:
                 for i in range(len(rsc.loaded)):
                     print(rsc.loaded[-i].name, rsc.loaded[-i].kind,
-                          rsc.loaded[-i].project,
+                          rsc.loaded[-i].project, rsc.loaded[-i].time,
                           rsc.loaded[-i].status, rsc.loaded[-i].temp)
         return None
         # ahh, jakaż okazja by to przerobić na generatorek
@@ -168,7 +168,7 @@ class Manage:
         self.TC_list.append(RSC_TC('TC_RT', 23))
         print(self.TC_list[-1].max_in)
         for i in range(qty):  # robimy komory
-            tc = 'TC_{}'.format(i)
+            tc = 'TC_{}'.format(i+1)
             temps = [-35, 85]
             self.TC_list.append(RSC_TC(tc, temps[1 if 3 * i % 2 == 0 else 0]))
                 # zwraca zawsze 0 lub 1 o ile sie nie jebnałem, bo kótka
@@ -176,6 +176,8 @@ class Manage:
                 # aż tak temp- do ustawiania wedle potrzeb razem z tempsem
             self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
+
+
 
     def gen_AT(self, at_qty):
         pass # TODO: analne stoły
@@ -478,7 +480,8 @@ class Deployment(Event):
 
 
 class RSC_TR(RSC):
-    pass
+    '''Pomieszczenia testowe'''
+
 
 
 class Analysis(Event):
@@ -596,3 +599,27 @@ def spread_from_sum(number, spread, *args):
 # LTS.Manage.spotX_on_RSC_loaded(mng, 2, Trumna, True)
 # LTS.Check_in(Trumna, Storage, 20).run_event()
 # LTS.Manage.spotX_on_RSC_loaded(mng, 2, Storage, True)
+
+################
+
+#
+# import LTS
+# mng = LTS.Manage(100, 3, 8)
+#
+# Trumna = mng.other_RSC[0]
+# Storage = mng.other_RSC[1]
+#
+# # print(mng.test_list, '\n\n',
+# #       mng.other_RSC, '\n\n',
+# #       mng.TC_list, '\n\n',
+# #       mng.TR_list)
+#
+# LTS.Transport(mng.test_list, Trumna, 60).run_event()
+# LTS.Manage.spotX_on_RSC_loaded(1, Trumna, True)
+# LTS.Check_in(Trumna, Storage, 20).run_event()
+# Storage.temp_count()
+# LTS.Conditioning(Storage, mng.TC_list, 240).run_event()
+# Storage.temp_count()
+# for tc in mng.TC_list:
+#     print('%s : %s : %s' % (tc.name, tc.temp, len(tc.loaded)))
+# #####################
