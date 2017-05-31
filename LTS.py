@@ -309,7 +309,7 @@ class Transport(Event):
 
         def run_Forest():
             t = self.pull_from.pop(0)
-
+            t.status = 'Delivery'
             self.add_to_log(t)
             self.push_to.load(t)
             self.add_time(t)
@@ -416,60 +416,49 @@ class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
     def __init__(self):
         super(RSC_Store, self).__init__()
+    def temp_count(self):
+        te_lst = []
+        tl = []
+        tc = {}
 
+        for test in self.loaded:
+            te_lst.append(test.temp)
+            if  not test.temp in tl:
+                tl.append(test.temp)
+        for temp in tl:
+            tc.update({temp : te_lst.count(temp)})
+
+        print(tc, sum(tc.values()))
 
 class Conditioning(Event):
     '''
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
     '''
+
     def run_event(self, module_qty=False):
-        TC_list = self.push_to
-        for TC in TC_list:
-            if TC.loaded < TC.max_in:
-                for test in S.loaded:
-                    if test.temp == TC.temp:
-                        TC.load(test)
 
-        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
-        # zaczynając od poczatku listy
-        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
-        # dla poszczegolnych eventów. W przypadku uzycia argumentu
-        # module_qty narzucony jest limit przenoszonych testów
-
-        def run_Forest():
-            t = self.pull_from.loaded.pop(0)
-
-            self.add_to_log(t)
-            self.push_to.load(t)
-            self.add_time(t)
-
-        if self.push_to.max_in == False:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0:
-                    #print('max in = False & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0:
-                    #print('max in = False & mod_qty = True')
-                    run_Forest()
-                    module_qty -= 1
-        else:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = True')
-                    run_Forest()
+        if len(self.pull_from.loaded) > 0: # spr czy jest co brac
+            for chamber in self.push_to: # dla kazdej komory
+                if len(chamber.loaded) < chamber.max_in: # jeslitylko jest w niej miejsce
+                    for test in self.pull_from.loaded: # to dla kazdego testu z listy
+                        if test.temp == chamber.temp: # jeżeli zgadza sie z temp komory
+                            if module_qty == False:
+                                self.pull_from.loaded.remove(test)
+                                chamber.load(test)
+                                test.status = 'Conditioning'
+                                self.add_to_log(test)
+                                self.add_time(test)
+                            elif module_qty > 0:
+                                self.pull_from.loaded(test)
+                                chamber.load(test)
+                                test.status = 'Conditioning'
+                                self.add_to_log(test)
+                                self.add_time(test)
 
 
 class RSC_TC(RSC):
     '''klasa definiujaca obiekty TemperatureChambers'''
-    temp_range = [-40, -35, -30, -25, 23, 80, 85, 90]
     def __init__(self, name=None, temp=None):
         self.name = name
         self.temp = temp
