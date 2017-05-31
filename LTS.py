@@ -14,14 +14,8 @@ class Manage:
     # ratings = {'1': [[1, 2, 1], [0, 0, 0]],
     #            '2': [[1, 1, 1], [0, 0, 0]],
     #            '3': [[2, 1, 1], [0, 0, 0]]}
-    # Lista zdarzeń do sprawdzenia kolejnego zdarzenia ktore
-    # mozna wykonac: petla while (np) leci po kazdym dodanym resourcie
-    # i spr rsc.in_queue lub .loaded (jedno z dwojga zaleznie od podejsia)
-    # i jezeli taka lista jest nie pusta odnajduje zaciagajacy lub wypychajacy
-    # event - albo zupełnie inaczej - np. eventy wyzwalaja
-    # sasiadujce eventy miedzy soba z automatu, albo
-    # roznie w zależności od rodzju procesu
-    def __init__(self, t_qty, tc_qty, tc_cap, frq_check_in):
+
+    def __init__(self, t_qty, tc_qty, tc_cap, frq_check_in=0):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
@@ -48,19 +42,20 @@ class Manage:
             day_time = 24
         q = day_time / transport_qty
         return q
- #TODO: nie wiem czy transport_qty powinno być pobierane bezpośrednio z Kivy czy najpier w __init__ i dopiero self.transport_qty w staticmetod
+        # TODO: nie wiem czy transport_qty powinno być pobierane bezpośrednio z Kivy
+        # czy najpier w __init__ i dopiero self.transport_qty w staticmetod
+        ### zobaczy sie
 
-    # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
-    # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
+        # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
+        # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
 
     def sim_run(self, first_run=True):
         if first_run == True:
-            # Tworzenie testów zapełniających komory (czy komory też mają być wtedy tworzone????)
-            # przed rozpoczęciem symulacji i zmiana parametru na False.
+            # Tworzenie testów zapełniających komory
             first_run = False
 
         while self.init:
-            #brak przypisania do zmiennej "check" bo po wejściu w while'a check bedzie miał
+            # brak przypisania do zmiennej "check" bo po wejściu w while'a check bedzie miał
             # zawsze początkową wartość == 0 (tak mi na ten moment wydaje :D)
             if self.real_time.check_time() == 0 or self.real_time.check_time() % Manage.transport_qty(3) == 0:
                 # nie przyjmuje żadnych rodzajów czasu, to robi klasa Time w __inint__ Manage, domyślnie jest min
@@ -104,14 +99,10 @@ class Manage:
         #     tmin += 1
 
 
-    def set_max_in(self, rsc_name, new_val):
-        # Funkcja - RSC - do zmian argumentu max_in(new_val)
-        pass
-        # RSC_trunk(rsc_name).set_max_in
 
-    # podglad modułów w danym zasobie RSC
-    def spotX_on_RSC_loaded(self, x, rsc, from_end=False):
-        # obecnie trzeba zapodać na selfie LTS.Manage(10)
+    @staticmethod
+    def spotX_on_RSC_loaded(x, rsc, from_end=False):
+        # obecnie trzeba zapodać na selfie LTS.Manage
         # Nie trzeba dawać 10. Można dać 2. Lub 3. Lub 7. Cokolwiek
         if len(rsc.loaded) == 0: print('Brak modułów w podanym zasobie')
         if from_end:
