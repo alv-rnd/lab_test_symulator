@@ -24,6 +24,7 @@ class Manage:
         self.other_RSC =[]
         self.TC_list = []
         self.TR_list = []
+        self.AT_list = []
         self.ready_list = {}
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
@@ -66,8 +67,13 @@ class Manage:
                 Check_in(self.other_RSC[0], self.other_RSC[1], 30) # i tu też czas z Kivy???
             if self.real_time.check_time() % self.frq_check_in == 0:
                 Conditioning(self.other_RSC[1], self.TC_list, 240) # brak parametru "first_run" bo nie ma go w Event
+            for tr in self.TR_list:
+                for test in tr.loaded:
+                    if self.real_time.check_time() >= test.my_time():
+                        Analysis(tr, self.AT_list, 15) # komentarz
             if len(self.ready_list) > 0: # kiedy będą wrzucane moduły do ready_list? jaki warunek (interwał czasowy) bedzie to obsługiwał
-                                         #czy tak jak pisałeś jakiś static metod? czy
+                for tr in self.TR_list: #czy tak jak pisałeś jakiś static metod? czy
+                    pass
                 pass # nie dużo zrobiłem ale pasuje bo juz nie ogasrniam :D
 
         # tmin = 0 #jakiś przykładowy czas w min
@@ -92,10 +98,10 @@ class Manage:
         #             # czy cuś w ten deseń
         #             for test in rdy_lst:
         #                 Deployment(rdy_lst, self.TR_list, 20)
-        #             for tr in self.TR_list:
-        #                 for test in tr.loaded:
-        #                     if tmin >= test.time:
-        #                         Analysis(tr.loaded, self.finished)
+#             for tr in self.TR_list:
+#                 for test in tr.loaded:
+#                     if tmin >= test.time:
+#                         Analysis(tr, self.finished)
         #     tmin += 1
 
 
@@ -132,11 +138,12 @@ class Manage:
 
 
     # generatorki do obrobienia jeszcze - moze sie przyda:
-    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap):
+    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap, at_qty):
         self.gen_Trunk()
         self.gen_Tests(t_qty)
         self.gen_Storage()
         self.gen_TCs(tc_qty, tc_cap)
+        # TODO: self.gen_AT(at_qty)
         #cdn
 
     def gen_Trunk(self):
@@ -170,6 +177,8 @@ class Manage:
             self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
 
+    def gen_AT(self, at_qty):
+        pass # TODO: analne stoły
 
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
