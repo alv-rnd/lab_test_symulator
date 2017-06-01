@@ -25,7 +25,7 @@ class Manage:
         self.TC_list = []
         self.TR_list = []
         self.AT_list = []
-        self.ready_list = {}
+        self.ready_list = []
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
@@ -261,7 +261,6 @@ class RSC:
     '''klasa bazowa dla obiektow z grupy ReSourCes'''
     def __init__(self, max_in=False):
         self.max_in = max_in
-        self.in_queue = []
         self.loaded = []
         self.time = 0
 
@@ -281,13 +280,13 @@ class RSC:
     def del_queue(self, testobj):
         self.in_queue.remove(testobj)
 
-    def load(self, test):
+    def load(self, test, if_queue=False):
         #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
         if self.max_in == False:
             self.loaded.append(test)
         elif len(self.loaded) < self.max_in:
             self.loaded.append(test)
-        else:
+        elif if_queue:
             self.in_queue.append(test)
         # TODO: przekazywanie informacji do logów
         # TODO: obsluga czasow
@@ -419,6 +418,7 @@ class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
     def __init__(self):
         super(RSC_Store, self).__init__()
+
     def temp_count(self):
         te_lst = []
         tl = []
@@ -440,24 +440,22 @@ class Conditioning(Event):
     '''
 
     def run_event(self, module_qty=False):
-
+        l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
-            for chamber in self.push_to: # dla kazdej komory
-                if len(chamber.loaded) < chamber.max_in: # jeslitylko jest w niej miejsce
-                    for test in self.pull_from.loaded: # to dla kazdego testu z listy
-                        if test.temp == chamber.temp: # jeżeli zgadza sie z temp komory
+            for test in self.pull_from.loaded:
+                for chamber in self.push_to:
+                    if test.temp == chamber.temp:
+                        if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
                             if module_qty == False:
-                                self.pull_from.loaded.remove(test)
                                 chamber.load(test)
+                                l.append(test)
                                 test.status = 'Conditioning'
                                 self.add_to_log(test)
                                 self.add_time(test)
-                            elif module_qty > 0:
-                                self.pull_from.loaded(test)
-                                chamber.load(test)
-                                test.status = 'Conditioning'
-                                self.add_to_log(test)
-                                self.add_time(test)
+        for item in l:
+            if item in self.pull_from.loaded:
+                self.pull_from.loaded.remove(item)
+
 
 
 class RSC_TC(RSC):
@@ -482,7 +480,7 @@ class Deployment(Event):
 
 class RSC_TR(RSC):
     '''Pomieszczenia testowe'''
-    def __init__(self, name, IN=False, *args, *kws):
+    def __init__(self, name, IN=False, *args, **kws):
         self.name = name
         self.IN = IN
         super(RSC_TR, self).__init__()
