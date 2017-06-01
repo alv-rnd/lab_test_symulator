@@ -29,6 +29,7 @@ class Manage:
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
         self.real_time = Time()
 
+
     @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym, może być na około
     def transport_qty(transport_qty, approach=True):
         """
@@ -476,13 +477,15 @@ class Deployment(Event):
     Klasa symulująca przeprowandzenia testu. Zmiana statusu
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
-    pass
+    
 
 
 class RSC_TR(RSC):
     '''Pomieszczenia testowe'''
-
-
+    def __init__(self, name, IN=False, *args, *kws):
+        self.name = name
+        self.IN = IN
+        super(RSC_TR, self).__init__()
 
 class Analysis(Event):
     '''
