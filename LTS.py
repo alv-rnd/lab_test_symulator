@@ -440,16 +440,16 @@ class Conditioning(Event):
                 for chamber in self.push_to:
                     if test.temp == chamber.temp:
                         if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
-                            if module_qty == False:
+                            if test not in l:
                                 chamber.load(test)
                                 l.append(test)
                                 test.status = 'Conditioning'
                                 self.add_to_log(test)
                                 self.add_time(test)
+
         for item in l:
             if item in self.pull_from.loaded:
                 self.pull_from.loaded.remove(item)
-
 
 
 class RSC_TC(RSC):
@@ -469,6 +469,7 @@ class Deployment(Event):
     Klasa symulująca przeprowandzenia testu. Zmiana statusu
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
+    pass
     
 
 
@@ -478,6 +479,7 @@ class RSC_TR(RSC):
         self.name = name
         self.IN = IN
         super(RSC_TR, self).__init__()
+
 
 class Analysis(Event):
     '''
@@ -496,7 +498,6 @@ class RSC_Analysis(RSC):
 
     def del_queue(self, testobj):
         self.in_queue.remove(testobj)
-
 
 
 class Modulet:
