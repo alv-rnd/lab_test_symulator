@@ -274,12 +274,6 @@ class RSC:
            self.loaded =  self.loaded[:new_val]
            self.max_in = new_val
 
-    def add_queue(self, testobj):
-        self.in_queue.append(testobj)
-
-    def del_queue(self, testobj):
-        self.in_queue.remove(testobj)
-
     def load(self, test, if_queue=False):
         #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
         if self.max_in == False:
@@ -492,8 +486,17 @@ class Analysis(Event):
     pass
 
 
-class RSC_Analysis:
-    pass
+class RSC_Analysis(RSC):
+    def __init__(self, *args, **kwargs):
+        super(RSC_Analysis, self).__init__(*args, **kwargs)
+        self.in_queue = []
+
+    def add_queue(self, testobj):
+        self.in_queue.append(testobj)
+
+    def del_queue(self, testobj):
+        self.in_queue.remove(testobj)
+
 
 
 class Modulet:
