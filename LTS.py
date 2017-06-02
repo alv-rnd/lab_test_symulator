@@ -148,6 +148,7 @@ class Manage:
     def gen_Trunk(self):
         trumna = RSC_trunk('TrumnaAPA')
         self.other_RSC.append(trumna)
+        print('Utworzono TrumnaAPA')
         return None
 
     def gen_Tests(self, qty):
@@ -160,12 +161,11 @@ class Manage:
     def gen_Storage(self):
         storage = RSC_Store('StorageLAB')
         self.other_RSC.append(storage)
-        print('Utworzono strefe ', storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
+        print('Utworzono strefe StorageLAB')
         return None
 
     def gen_TCs(self, qty, cap):
         self.TC_list.append(RSC_TC('TC_RT', 23))
-        print(self.TC_list[-1].max_in)
         for i in range(qty):  # robimy komory
             tc = 'TC_{}'.format(i+1)
             temps = [-35, 85]
@@ -176,12 +176,19 @@ class Manage:
             self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
 
-    def gen_TRs(self, tr_qty):
-        for i in range(tr_qty):  # robimy komory
+    def gen_TRs(self, tr_qty, wich_qty=0):
+
+        for i in range(tr_qty):  # robimy TRy
             tr = 'TR_{}'.format(i+1)
             self.TR_list.append(RSC_TR(tr))
             self.TR_list[-1].set_max_in(1)
         print('Utworzono TestRoomy TR_1 do TR_%s' %(tr_qty))
+        if wich_qty > 0:
+            for i in range(wich_qty):  # robimy WICHy
+                w = 'WICH_{}'.format(i+1)
+                self.TR_list.append(RSC_TR(w, IN=True))
+                self.TR_list[-1].set_max_in(1)
+            print('Utworzono komory testowe WICH_1 do WICH_%s' %(tr_qty))
 
     def gen_ATs(self, at_qty):
         for i in range(at_qty):  # robimy komory
@@ -446,13 +453,13 @@ class Deployment(Event):
     Klasa symulująca przeprowandzenia testu. Zmiana statusu
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
-    def __init__(self, *args, **kws):
-        super(Deployment, self).__init__(*args, **kws)
+    # def __init__(self, *args, **kws):
+    #     super(Deployment, self).__init__(*args, **kws)
 
     def run_event(self):
         l = []
         for test in Conditioning.rdylst:
-            for tr in self.pull_from:
+            for tr in self.push_to:
                 if len(tr.loaded) < tr.max_in:
                     tr.load(test)
                     l.append(test)
@@ -462,8 +469,9 @@ class Deployment(Event):
 
         for item in l:
             for j in range(len(self.pull_from)):
-                if item in self.pull_from[j].loaded:
-                    self.pull_from.loaded.remove(item)
+                    chamber = self.pull_from[j]
+                    if item in chamber.loaded:
+                        chamber.loaded.remove(item)
             for k in range(len(Conditioning.rdylst)):
                 if item in Conditioning.rdylst:
                     Conditioning.rdylst.remove(item)
@@ -492,28 +500,41 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
     def run_event(self):
-        l = []
-        for test in Conditioning.rdylst:
-            for tr in self.pull_from:
-                if len(tr.loaded) < tr.max_in:
-                    tr.load(test)
-                    l.append(test)
-                    test.status = 'ANALYSIS'
-                    self.add_time(test)
-                    self.add_to_log(test)
+        # do przeróbyyyyyy
+        l, k = [], []
+        for tr in self.pull_from: # z listy test roomow
+            for test in tr.loaded: # z kazdego tr pobierz test
+                self.push_to[0].in_queue.append(test)
+                k.append(test) # i wrzuc do koljki
+            for item in k:
+                for i in range(len(tr.loaded)):
+                    if item in tr.loaded:
+                        tr.loaded.remove(item)
+        if len(self.push_to[0].in_queue) > 0:
+            for test in self.push_to.in_queue:
+                for at in self.push_to:
+                    if len(at.loaded) < at.max_in:
+                        at.load(test)
+                        l.append(test)
+                        test.status = 'ANALYSIS'
+                        self.add_time(test)
+                        self.add_to_log(test)
+            for item in l:
+                for j in range(len(self.push_to.in_queue)):
+                    if item in self.push_to.in_queue:
+                        self.push_to.in_queue.remove(item)
 
-        for item in l:
-            for j in range(len(self.pull_from)):
-                if item in self.pull_from[j].loaded:
-                    self.pull_from.loaded.remove(item)
 
     pass
 
 
 class RSC_Analysis(RSC):
+    '''Analysis Tables'''
+    in_queue = [] #bo kolejka do stołów jest jedna
+
     def __init__(self, *args, **kwargs):
         super(RSC_Analysis, self).__init__(*args, **kwargs)
-        self.in_queue = []
+
 
     def add_queue(self, testobj):
         self.in_queue.append(testobj)
