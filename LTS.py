@@ -15,10 +15,12 @@ class Manage:
     #            '2': [[1, 1, 1], [0, 0, 0]],
     #            '3': [[2, 1, 1], [0, 0, 0]]}
 
-    def __init__(self, t_qty, tc_qty, tc_cap, frq_check_in=0):
+    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in=0):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
+        self.tr_qty = tr_qty
+        self.at_qty = at_qty
         self.frq_check_in = frq_check_in
         self.test_list = []
         self.other_RSC =[]
@@ -26,7 +28,7 @@ class Manage:
         self.TR_list = []
         self.AT_list = []
         self.ready_list = []
-        self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap)
+        self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.at_qty)
         self.real_time = Time()
 
 
@@ -44,12 +46,6 @@ class Manage:
             day_time = 24
         q = day_time / transport_qty
         return q
-        # TODO: nie wiem czy transport_qty powinno być pobierane bezpośrednio z Kivy
-        # czy najpier w __init__ i dopiero self.transport_qty w staticmetod
-        ### zobaczy sie
-
-        # Myśl która przemknęła przez mą głowę, czy jak użytkownik zaż(rz)yczy sobie żeby po zakończonej symulacji kontynuować
-        # czyli wejściowymi będą dane z Fin (czyli generowane randomowo dane żeby zapełnić komory) # luźna myśl do wytłumaczenia
 
     def sim_run(self, first_run=True):
         if first_run == True:
@@ -91,10 +87,10 @@ class Manage:
         #         Check_in(trumnaAPA, storageLAB, 20)
         #     if tmin%120 == 0: # co 2h wrzucamy do kondycjonowania
         #         Conditioning(storageLAB, self.TC_list, 240, first_run=False(by default))
-#             for tr in self.TR_list:
-#                 for test in tr.loaded:
-#                     if tmin >= test.time:
-#                         Analysis(tr.loaded, self.finished)
+        #           for tr in self.TR_list:
+        #               for test in tr.loaded:
+        #                   if tmin >= test.time:
+        #                       Analysis(tr.loaded, self.finished)
         #     if len(rdy_lst) > 0: # moe rdy zapisac w postaci jakiegos
         #         # static method czy param? coby sie spr z kazda iteracja czasu
         #         for TR in self.TR_list:
@@ -139,16 +135,18 @@ class Manage:
 
 
     # generatorki do obrobienia jeszcze - moze sie przyda:
-    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap):
+    def gen_ALL_RSCs(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty):
         self.gen_Trunk()
         self.gen_Tests(t_qty)
         self.gen_Storage()
         self.gen_TCs(tc_qty, tc_cap)
+        self.gen_TRs(tr_qty)
+        self.gen_ATs(at_qty)
         # TODO: self.gen_AT(at_qty)
         #cdn
 
     def gen_Trunk(self):
-        trumna = RSC_trunk()
+        trumna = RSC_trunk('TrumnaAPA')
         self.other_RSC.append(trumna)
         return None
 
@@ -160,9 +158,9 @@ class Manage:
         return self.test_list
 
     def gen_Storage(self):
-        Storage = RSC_Store()
-        self.other_RSC.append(Storage)
-        print('Utworzono strefe ', Storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
+        storage = RSC_Store('StorageLAB')
+        self.other_RSC.append(storage)
+        print('Utworzono strefe ', storage, 'wielką i nieskończoną. Na horyzoncie widać Mordor')
         return None
 
     def gen_TCs(self, qty, cap):
@@ -178,10 +176,20 @@ class Manage:
             self.TC_list[-1].set_max_in(cap)
         print('Utworzono komory TC_1 do TC_%s' %(qty))
 
+    def gen_TRs(self, tr_qty):
+        for i in range(tr_qty):  # robimy komory
+            tr = 'TR_{}'.format(i+1)
+            self.TR_list.append(RSC_TR(tr))
+            self.TR_list[-1].set_max_in(1)
+        print('Utworzono TestRoomy TR_1 do TR_%s' %(tr_qty))
 
+    def gen_ATs(self, at_qty):
+        for i in range(at_qty):  # robimy komory
+            at = 'AT_{}'.format(i+1)
+            self.AT_list.append(RSC_Analysis(at))
+            self.AT_list[-1].set_max_in(1)
+        print('Utworzono Stanowiska Analizy AT_1 do AT_%s' %(at_qty))
 
-    def gen_AT(self, at_qty):
-        pass # TODO: analne stoły
 
 class Time:
     time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
@@ -303,10 +311,10 @@ class Transport(Event):
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
 
-    def __init__(self, *args, **kws):
+    def __init__(self, name, *args, **kws):
         super(RSC_trunk, self).__init__(**kws)
         # Klasa przyjmuje jedynie jeden lub dwa argumenty liczbowe
-
+        self.name = name
         if len(args) > 2:
             args = args[:2]
         if args:
@@ -372,9 +380,9 @@ class Check_in(Event):
 
 class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
-    def __init__(self):
+    def __init__(self, name):
         super(RSC_Store, self).__init__()
-
+        self.name = name
     def temp_count(self, limit=0):
         te_lst = []
         tl = []
@@ -448,19 +456,19 @@ class Deployment(Event):
                 if len(tr.loaded) < tr.max_in:
                     tr.load(test)
                     l.append(test)
-                    test.status = 'Conditioning'
-                    self.add_to_log(test)
+                    test.status = 'DEPLOYMENT'
                     self.add_time(test)
+                    self.add_to_log(test)
 
         for item in l:
             for j in range(len(self.pull_from)):
                 if item in self.pull_from[j].loaded:
                     self.pull_from.loaded.remove(item)
-                
-            
-            
-    pass
-    
+            for k in range(len(Conditioning.rdylst)):
+                if item in Conditioning.rdylst:
+                    Conditioning.rdylst.remove(item)
+
+
 
 
 class RSC_TR(RSC):
@@ -483,6 +491,22 @@ class Analysis(Event):
     '''
     zmiana statusu na finalny, dodanie oceny testu.
     '''
+    def run_event(self):
+        l = []
+        for test in Conditioning.rdylst:
+            for tr in self.pull_from:
+                if len(tr.loaded) < tr.max_in:
+                    tr.load(test)
+                    l.append(test)
+                    test.status = 'ANALYSIS'
+                    self.add_time(test)
+                    self.add_to_log(test)
+
+        for item in l:
+            for j in range(len(self.pull_from)):
+                if item in self.pull_from[j].loaded:
+                    self.pull_from.loaded.remove(item)
+
     pass
 
 
