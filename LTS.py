@@ -219,14 +219,14 @@ class Event:
         log = {module.time: ['Event', module]}
         module.add_to_log(log)
 
-    def run_event(self, module_qty=False):
+    def run_event(self):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        def run_Forest():
+        def run_update_tparams():
             t = self.pull_from.loaded.pop(0)
 
             self.add_to_log(t)
@@ -234,26 +234,12 @@ class Event:
             self.add_time(t)
 
         if self.push_to.max_in == False:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0:
-                    #print('max in = False & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0:
-                    #print('max in = False & mod_qty = True')
-                    run_Forest()
-                    module_qty -= 1
+            while len(self.pull_from.loaded) > 0:
+                run_update_tparams()
         else:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    #print('max in = True & mod_qty = True')
-                    run_Forest()
+            while len(self.pull_from.loaded) > 0 and \
+                    self.push_to.max_in - len(self.push_to.loaded) > 0:
+                run_update_tparams()
 
 
 class RSC:
@@ -274,16 +260,12 @@ class RSC:
            self.loaded =  self.loaded[:new_val]
            self.max_in = new_val
 
-    def load(self, test, if_queue=False):
+    def load(self, test):
         #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
         if self.max_in == False:
             self.loaded.append(test)
         elif len(self.loaded) < self.max_in:
             self.loaded.append(test)
-        elif if_queue:
-            self.in_queue.append(test)
-        # TODO: przekazywanie informacji do logów
-        # TODO: obsluga czasow
 
 
 class Transport(Event):
@@ -296,14 +278,14 @@ class Transport(Event):
     def __init__(self, *args):
         super(Transport, self).__init__(*args)
 
-    def run_event(self, module_qty=False):
+    def run_event(self):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        def run_Forest():
+        def run_update_tparams():
             t = self.pull_from.pop(0)
             t.status = 'Delivery'
             self.add_to_log(t)
@@ -311,20 +293,12 @@ class Transport(Event):
             self.add_time(t)
 
         if self.push_to.max_in == False:
-            if module_qty == False:
-                while len(self.pull_from) > 0:
-                    run_Forest()
-            else:
-                while len(self.pull_from) > 0 and module_qty > 0:
-                    run_Forest()
-                    module_qty -= 1
+            while len(self.pull_from) > 0:
+                run_update_tparams()
         else:
-            if module_qty == False:
-                while len(self.pull_from) > 0 and self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    run_Forest()
-            else:
-                while len(self.pull_from) > 0 and module_qty > 0 and self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    run_Forest()
+            while len(self.pull_from) > 0 and self.push_to.max_in - len(self.push_to.loaded) > 0:
+                run_update_tparams()
+
 
 class RSC_trunk(RSC):
     '''klasa definiujaca trumne'''
@@ -377,7 +351,7 @@ class Check_in(Event):
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
-        def run_Forest():
+        def run_update_tparams():
             t = self.pull_from.loaded.pop(0)
             self.gen_rand_testparam(t) # nadajemy losowe parametry
             t.status = 'Checked in' # updateujemy status
@@ -386,26 +360,14 @@ class Check_in(Event):
             self.add_time(t)      # updateujemy self.time modulu
 
         if self.push_to.max_in == False:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0:
-                    # print('max in = False & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0:
-                    # print('max in = False & mod_qty = True')
-                    run_Forest()
-                    module_qty -= 1
+            while len(self.pull_from.loaded) > 0:
+                # print('max in = False & mod_qty = False')
+                run_update_tparams()
         else:
-            if module_qty == False:
-                while len(self.pull_from.loaded) > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
+            while len(self.pull_from.loaded) > 0 and \
+                self.push_to.max_in - len(self.push_to.loaded) > 0:
                     # print('max in = True & mod_qty = False')
-                    run_Forest()
-            else:
-                while len(self.pull_from.loaded) > 0 and module_qty > 0 and \
-                                        self.push_to.max_in - len(self.push_to.loaded) > 0:
-                    # print('max in = True & mod_qty = True')
-                    run_Forest()
+                run_update_tparams()
 
 
 class RSC_Store(RSC):
@@ -413,7 +375,7 @@ class RSC_Store(RSC):
     def __init__(self):
         super(RSC_Store, self).__init__()
 
-    def temp_count(self):
+    def temp_count(self, limit=0):
         te_lst = []
         tl = []
         tc = {}
@@ -425,6 +387,7 @@ class RSC_Store(RSC):
         for temp in tl:
             tc.update({temp : te_lst.count(temp)})
 
+
         print(tc, sum(tc.values()))
 
 class Conditioning(Event):
@@ -432,8 +395,10 @@ class Conditioning(Event):
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
     '''
+    rdylst = []
 
-    def run_event(self, module_qty=False):
+
+    def run_event(self):
         l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
             for test in self.pull_from.loaded:
@@ -442,6 +407,7 @@ class Conditioning(Event):
                         if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
                             if test not in l:
                                 chamber.load(test)
+                                self.add_to_rdylst(test)
                                 l.append(test)
                                 test.status = 'Conditioning'
                                 self.add_to_log(test)
@@ -450,6 +416,9 @@ class Conditioning(Event):
         for item in l:
             if item in self.pull_from.loaded:
                 self.pull_from.loaded.remove(item)
+
+    def add_to_rdylst(self, test):
+        self.rdylst.append(test)
 
 
 class RSC_TC(RSC):
@@ -469,6 +438,27 @@ class Deployment(Event):
     Klasa symulująca przeprowandzenia testu. Zmiana statusu
     W jej obebie mają znajdować sie TR oraz WICH (dodatkowy czas 30 minut dokondycjonowania doliczany w tym typie)
     '''
+    def __init__(self, *args, **kws):
+        super(Deployment, self).__init__(*args, **kws)
+
+    def run_event(self):
+        l = []
+        for test in Conditioning.rdylst:
+            for tr in self.pull_from:
+                if len(tr.loaded) < tr.max_in:
+                    tr.load(test)
+                    l.append(test)
+                    test.status = 'Conditioning'
+                    self.add_to_log(test)
+                    self.add_time(test)
+
+        for item in l:
+            for j in range(len(self.pull_from)):
+                if item in self.pull_from[j].loaded:
+                    self.pull_from.loaded.remove(item)
+                
+            
+            
     pass
     
 
@@ -480,6 +470,14 @@ class RSC_TR(RSC):
         self.IN = IN
         super(RSC_TR, self).__init__()
 
+    def load(self, test):
+        #zaladuj jesli jest miejsce, jak nie to zaladuj do kolejki
+        if self.max_in == False:
+            self.loaded.append(test)
+        elif len(self.loaded) < self.max_in:
+            self.loaded.append(test)
+        elif len(self.loaded) >= self.max_in:
+            self.in_queue.append(test)
 
 class Analysis(Event):
     '''
@@ -504,6 +502,12 @@ class Modulet:
     '''
     klasa w obrębie której będą bedą gromadzić się parametry uzyskiwane w poszczególnych etapach procesu.
     '''
+
+    project_rat = {} # zbiera projekty
+    rating_list = {} # zbiera na piwo
+    project_rcount = {}
+
+
     ab_kind = 'dab pab sab kab ic'.upper().split()
 
     def __init__(self, name):
@@ -524,6 +528,44 @@ class Modulet:
         self.temp = None
         self.result_eval = False
         self.log = {}
+        #rsc redy robi sie w conditioning
+    def gen_proj_rat(self):
+        pass
+
+    def gen_rand_rat(self, temps=False, spread=2):
+        # SPR CZY JEST RATING DLA PROJ I DODANIE JESLI NEI MA
+
+        if not self.project in self.project_rat.keys():
+            if temps == False:
+                temps = [-35, 23, 85]
+            rv = []
+            for i in range(len(temps)):
+                rv.append(np.random.randint(1, spread+1))
+            if rv.count(rv[0]) == len(rv):
+                rv = [1 for x in range(len(rv))]
+
+            self.project_rat[self.project] = rv
+
+    def r_scn(self):
+        for t, q in zip(self.project_rat[self.project],
+                 self.project_rcount[self.project]):
+            for tx, qx in zip(t, q):
+                if self.time == tx:
+                    print(qx)
+
+    def get_temp_from_rat(self):
+        # nadaje temp na podst ratingu
+
+        tqxcount = ((t.count(tx)/len(t))/(qx/sum(q))
+                    for t, q in zip(self.project_rat[self.project],
+                                    self.project_rcount[self.project])
+                    for tx, qx in zip(t, q))
+
+        print(filter(min, tqxcount))
+
+
+
+
 
     def my_time(self):
         #pokaz swoj czas
