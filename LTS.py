@@ -510,23 +510,24 @@ class Analysis(Event):
                 for i in range(len(tr.loaded)):
                     if item in tr.loaded:
                         tr.loaded.remove(item)
-        if len(self.push_to[0].in_queue) > 0:
-            for test in self.push_to.in_queue:
-                for at in self.push_to:
-                    if len(at.loaded) < at.max_in:
-                        at.load(test)
-                        l.append(test)
-                        test.status = 'ANALYSIS'
-                        self.add_time(test)
-                        self.add_to_log(test)
+
+
+        for at in self.push_to:
+            for test in at.in_queue:
+                if len(at.loaded) < at.max_in:
+                    at.load(test)
+                    l.append(test)
+                    test.status = 'ANALYSIS'
+                    test.result_eval = random.choice(['OK', 'COK', 'NOK'])
+                    self.add_time(test)
+                    self.add_to_log(test)
             for item in l:
-                for j in range(len(self.push_to.in_queue)):
-                    if item in self.push_to.in_queue:
-                        self.push_to.in_queue.remove(item)
+                for j in range(len(at.in_queue)):
+                    if item in at.in_queue:
+                        at.in_queue.remove(item)
 
-
+class Fin:
     pass
-
 
 class RSC_Analysis(RSC):
     '''Analysis Tables'''
