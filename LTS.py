@@ -22,6 +22,7 @@ class Manage:
         self.tr_qty = tr_qty
         self.at_qty = at_qty
         self.frq_check_in = frq_check_in
+        # self.temp_list = temp_list
         self.test_list = []
         self.other_RSC =[]
         self.TC_list = []
@@ -41,9 +42,9 @@ class Manage:
         :return: ilość transportów
         """
         if approach == True:
-            day_time = 12
+            day_time = 720
         else:
-            day_time = 24
+            day_time = 1440
         q = day_time / transport_qty
         return q
 
@@ -53,17 +54,26 @@ class Manage:
             first_run = False
 
         while self.init:
-            # brak przypisania do zmiennej "check" bo po wejściu w while'a check bedzie miał
-            # zawsze początkową wartość == 0 (tak mi na ten moment wydaje :D)
-            if self.real_time.check_time() == 0 or self.real_time.check_time() % Manage.transport_qty(3) == 0:
-                # nie przyjmuje żadnych rodzajów czasu, to robi klasa Time w __inint__ Manage, domyślnie jest min
+            check_time = self.real_time.check_time()
+            # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
+            # podzielny przez wartość która zwraca 'transport_qty'
+            if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
+                Transport(self.test_list, self.other_RSC[0], 120)
+                Check_in(self.other_RSC[0], self.other_RSC[1], 30)
 
-                # gen.test() co to było??
-                Transport(self.test_list, self.other_RSC[0], 120) # czas transportu docelowo z Kivy???? chyba
-                #rozładunek możey być robiony po pierwszym while'u, jeszcze nie wiem jak ale tak :D
-                Check_in(self.other_RSC[0], self.other_RSC[1], 30) # i tu też czas z Kivy???
-            if self.real_time.check_time() % self.frq_check_in == 0:
-                Conditioning(self.other_RSC[1], self.TC_list, 240) # brak parametru "first_run" bo nie ma go w Event
+            # Uruchamianie Eventu Conditioning, jeżeli czas dzieli się na czas 'frq_check_in' albo jest równy 0
+            if check_time % self.frq_check_in == 0 or self.frq_check_in == 0:
+                Conditioning(self.other_RSC[1], self.TC_list, 240)
+
+            # Uruchomienie eventu Analiza
+            Analysis(self.TR_list, self.AT_list, 15).run_event()
+
+            # Uruchomienie
+            Deployment(self.TC_list, self.TR_list, 15).run_event()
+
+
+
+
             for tr in self.TR_list:
                 for test in tr.loaded:
                     if self.real_time.check_time() >= test.my_time():
@@ -73,6 +83,7 @@ class Manage:
                     pass
                 pass # nie dużo zrobiłem ale pasuje bo juz nie ogasrniam :D
 
+            self.real_time.real_time += 1
         # tmin = 0 #jakiś przykładowy czas w min
         # transport_qty_per_day = 3 #zgadnij
         # m = 24/transport_qty_per_day #do modulo w ifie ponizej
@@ -108,7 +119,7 @@ class Manage:
         # obecnie trzeba zapodać na selfie LTS.Manage
         # Nie trzeba dawać 10. Można dać 2. Lub 3. Lub 7. Cokolwiek
         if len(rsc.loaded) == 0: print('Brak modułów w podanym zasobie')
-        if from_end:
+        if from_end == False:
             if len(rsc.loaded) > x:
                 for i in range(x):
                     print(rsc.loaded[i].name, rsc.loaded[i].kind,
@@ -142,7 +153,6 @@ class Manage:
         self.gen_TCs(tc_qty, tc_cap)
         self.gen_TRs(tr_qty)
         self.gen_ATs(at_qty)
-        # TODO: self.gen_AT(at_qty)
         #cdn
 
     def gen_Trunk(self):
@@ -156,7 +166,7 @@ class Manage:
             test_name = 'Test{}'.format(i + 1)
             self.test_list.append(Modulet(test_name))
         print('Dodano(utworzono)', qty, 'testów do \'test_list\'y')
-        return self.test_list
+        return None
 
     def gen_Storage(self):
         storage = RSC_Store('StorageLAB')
@@ -229,6 +239,9 @@ class Event:
         # uzywana w run_event do zmiany czasu odwoluje sie do
         # funkcji o tej samej nazwie w Modulet
         module.add_time(self.event_time)
+
+    def add_real_time(self, time):
+
 
     def add_to_log(self, module):
         log = {module.time: ['Event', module]}
@@ -352,7 +365,7 @@ class Check_in(Event):
         test.project = random.randint(1, self.project_qty + 1)
         # losowanie in/out -> modulet
         test.kind = random.choice(Modulet.ab_kind)
-        test.temp = random.choice([-35, 23, 85])
+        test.temp = random.choice([-35, -30, 23, 85, 90])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
         # if str(test.project) in Manage.ratings.keys():
         #     print('kupa')
@@ -572,6 +585,7 @@ class Modulet:
         self.result_eval = False
         self.log = {}
         #rsc redy robi sie w conditioning
+
     def gen_proj_rat(self):
         pass
 
