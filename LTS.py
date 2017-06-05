@@ -511,7 +511,6 @@ class Analysis(Event):
                     if item in tr.loaded:
                         tr.loaded.remove(item)
 
-
         for at in self.push_to:
             for test in at.in_queue:
                 if len(at.loaded) < at.max_in:
@@ -525,14 +524,12 @@ class Analysis(Event):
                 for j in range(len(at.in_queue)):
                     if item in at.in_queue:
                         at.in_queue.remove(item)
-
-class Fin:
-    pass
+                        at.finit.append(item)
 
 class RSC_Analysis(RSC):
     '''Analysis Tables'''
     in_queue = [] #bo kolejka do stołów jest jedna
-
+    finit = []
     def __init__(self, *args, **kwargs):
         super(RSC_Analysis, self).__init__(*args, **kwargs)
 
@@ -675,44 +672,29 @@ def spread_from_sum(number, spread, *args):
     return rand_list
 
 #######################################
+    # import LTS
+    # mng = LTS.Manage(100, 3, 8, 4, 4)
+    #
+    # Trumna = mng.other_RSC[0]
+    # Storage = mng.other_RSC[1]
+    #
+    # # print(mng.test_list, '\n\n',
+    # #       mng.other_RSC, '\n\n',
+    # #       mng.TC_list, '\n\n',
+    # #       mng.TR_list)
+    #
+    # LTS.Transport(mng.test_list, Trumna, 60).run_event()
+    # LTS.Manage.spotX_on_RSC_loaded(1, Trumna, True)
+    # LTS.Check_in(Trumna, Storage, 20).run_event()
+    # Storage.temp_count()
+    # LTS.Conditioning(Storage, mng.TC_list, 240).run_event()
+    # Storage.temp_count()
+    # for tc in mng.TC_list:
+    #     print('%s : %s : %s : %s' % (tc.name, tc.temp, len(tc.loaded), tc.max_in))
+    # LTS.Deployment(mng.TC_list, mng.TR_list, 15).run_event()
+    # print('Aktualnie testowane w ', mng.TR_list[0].name)
+    # LTS.Manage.spotX_on_RSC_loaded(1, mng.TR_list[0])
+    # LTS.Analysis(mng.TR_list, mng.AT_list, 15).run_event()
+    # LTS.Manage.spotX_on_RSC_loaded(1, mng.AT_list[0])
 
-
-# import LTS
-# mng = LTS.Manage(10, 3, 8)
-#
-# Trumna = mng.other_RSC[0]
-# Storage = mng.other_RSC[1]
-#
-# # print(mng.test_list, '\n\n',
-# #       mng.other_RSC, '\n\n',
-# #       mng.TC_list, '\n\n',
-# #       mng.TR_list)
-#
-# LTS.Transport(mng.test_list, Trumna, 60).run_event()
-# LTS.Manage.spotX_on_RSC_loaded(mng, 2, Trumna, True)
-# LTS.Check_in(Trumna, Storage, 20).run_event()
-# LTS.Manage.spotX_on_RSC_loaded(mng, 2, Storage, True)
-
-################
-
-#
-# import LTS
-# mng = LTS.Manage(100, 3, 8)
-#
-# Trumna = mng.other_RSC[0]
-# Storage = mng.other_RSC[1]
-#
-# # print(mng.test_list, '\n\n',
-# #       mng.other_RSC, '\n\n',
-# #       mng.TC_list, '\n\n',
-# #       mng.TR_list)
-#
-# LTS.Transport(mng.test_list, Trumna, 60).run_event()
-# LTS.Manage.spotX_on_RSC_loaded(1, Trumna, True)
-# LTS.Check_in(Trumna, Storage, 20).run_event()
-# Storage.temp_count()
-# LTS.Conditioning(Storage, mng.TC_list, 240).run_event()
-# Storage.temp_count()
-# for tc in mng.TC_list:
-#     print('%s : %s : %s' % (tc.name, tc.temp, len(tc.loaded)))
-# #####################
+    # #####################
