@@ -7,7 +7,7 @@ import os
 
 
 class Manage:
-    init = True
+    more = True
     '''
     Klasa zarządzająca wszytkim
     '''
@@ -15,14 +15,14 @@ class Manage:
     #            '2': [[1, 1, 1], [0, 0, 0]],
     #            '3': [[2, 1, 1], [0, 0, 0]]}
 
-    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in=0):
+    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, time_format, frq_check_in=0):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
         self.tr_qty = tr_qty
         self.at_qty = at_qty
         self.frq_check_in = frq_check_in
-        # self.temp_list = temp_list
+        self.time_format = time_format
         self.test_list = []
         self.other_RSC =[]
         self.TC_list = []
@@ -30,7 +30,7 @@ class Manage:
         self.AT_list = []
         self.ready_list = []
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.at_qty)
-        self.real_time = Time()
+        self.real_time = Time(self.time_format)
 
 
     @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym, może być na około
@@ -49,41 +49,63 @@ class Manage:
         return q
 
     def sim_run(self, first_run=True):
-        if first_run == True:
-            # Tworzenie testów zapełniających komory
-            first_run = False
 
-        while self.init:
+        test_qty = len(self.test_list)
+
+        # TODO: kiedy ma być przerwanie whila? na razie dałem param 'more' który może być zmieniony jak ilość wygenerowanych testów będzie równa ilości testów w Fin
+        while self.more:
             check_time = self.real_time.check_time()
+            print(check_time)
             # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
             # podzielny przez wartość która zwraca 'transport_qty'
             if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
-                Transport(self.test_list, self.other_RSC[0], 120)
-                Check_in(self.other_RSC[0], self.other_RSC[1], 30)
+                Transport(self.test_list, self.other_RSC[0], 120).run_event()
+                print('Transport')
+                self.spotX_on_RSC_loaded(10, self.other_RSC[0])
+                Check_in(self.other_RSC[0], self.other_RSC[1], 30).run_event()
+                print('Check_in')
+                self.spotX_on_RSC_loaded(10, self.other_RSC[1])
 
-            # Uruchamianie Eventu Conditioning, jeżeli czas dzieli się na czas 'frq_check_in' albo jest równy 0
-            if check_time % self.frq_check_in == 0 or self.frq_check_in == 0:
-                Conditioning(self.other_RSC[1], self.TC_list, 240)
+            # Uruchamianie Eventu Conditioning, musi być najpierw sprawdzenie czy frq_check_in jest równy 0,
+            # inaczej wywala bład o dzieleniu przez 0 jeżeli od razu sprawdzimy modulo.
+            if self.frq_check_in == 0:
+                Conditioning(self.other_RSC[1], self.TC_list, 240).run_event()
+                print('Conditioning')
+                for TC in self.TC_list:
+                    self.spotX_on_RSC_loaded(10, TC)
 
-            # Uruchomienie eventu Analiza
+                #print('condi i frq_check == 0')
+            elif check_time % self.real_time.time_converter(self.frq_check_in) == 0:
+                Conditioning(self.other_RSC[1], self.TC_list, 240).run_event()
+                print('Conditioning')
+                for TC in self.TC_list:
+                    self.spotX_on_RSC_loaded(10, TC)
+                #print('condi i frq_check == 2')
+
+            # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
             Analysis(self.TR_list, self.AT_list, 15).run_event()
-
+            print('Alaliza')
+            for AT in self.AT_list:
+                self.spotX_on_RSC_loaded(1, AT)
             # Uruchomienie
             Deployment(self.TC_list, self.TR_list, 15).run_event()
+            print('TR')
+            for TR in self.TR_list:
+                self.spotX_on_RSC_loaded(1, TR)
+
+            if test_qty == len(RSC_Analysis.finit):
+                print(RSC_Analysis.finit)
+                self.more = False
+            elif check_time == 100:
+                break
+
+            # Zmieniłem na uruchamianie metody klasy Time, zamiast podbijania jej parametru,
+            # wychodząc z tej zasady że jedna klasa nie wpływa na paramy innej klasy bezpośrednio
+
+            self.real_time.add_real_time(1)
 
 
 
-
-            for tr in self.TR_list:
-                for test in tr.loaded:
-                    if self.real_time.check_time() >= test.my_time():
-                        Analysis(tr, self.AT_list, 15) # komentarz
-            if len(self.ready_list) > 0: # kiedy będą wrzucane moduły do ready_list? jaki warunek (interwał czasowy) bedzie to obsługiwał
-                for tr in self.TR_list: #czy tak jak pisałeś jakiś static metod? czy
-                    pass
-                pass # nie dużo zrobiłem ale pasuje bo juz nie ogasrniam :D
-
-            self.real_time.real_time += 1
         # tmin = 0 #jakiś przykładowy czas w min
         # transport_qty_per_day = 3 #zgadnij
         # m = 24/transport_qty_per_day #do modulo w ifie ponizej
@@ -209,7 +231,13 @@ class Manage:
 
 
 class Time:
-    time_formats = ['sek', 'min', 'hrs', 'day', 'mnt', 'yer']
+    time_formats = {'min': 1,
+                    'hrs': 60,
+                    'day': 1440,
+                    'mnt': 33120,
+                    'yer': 397440
+                    }
+
     def __init__(self, time_format='min', value=None):
         self.time_format = time_format
         self.value = value
@@ -219,13 +247,15 @@ class Time:
     def add_time_module(self, modulet):
         self.modulet = modulet
 
+    def add_real_time(self, counter):
+        self.real_time += counter
+
     def check_time(self):
         return self.real_time
-        # current_general_time = self.time_init +
 
-    def make_log(self):
-        pass
-        #log = pd
+    def time_converter(self, time):
+        t = time * self.time_formats[self.time_format]
+        return t
 
 
 class Event:
@@ -239,9 +269,6 @@ class Event:
         # uzywana w run_event do zmiany czasu odwoluje sie do
         # funkcji o tej samej nazwie w Modulet
         module.add_time(self.event_time)
-
-    def add_real_time(self, time):
-
 
     def add_to_log(self, module):
         log = {module.time: ['Event', module]}
@@ -358,8 +385,6 @@ class Check_in(Event):
     def set_project_qty(self, qty):
         self.project_qty = qty
 
-
-
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
         test.project = random.randint(1, self.project_qty + 1)
@@ -403,6 +428,7 @@ class RSC_Store(RSC):
     def __init__(self, name):
         super(RSC_Store, self).__init__()
         self.name = name
+
     def temp_count(self, limit=0):
         te_lst = []
         tl = []
@@ -418,6 +444,8 @@ class RSC_Store(RSC):
 
         print(tc, sum(tc.values()))
 
+
+
 class Conditioning(Event):
     '''
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
@@ -427,6 +455,10 @@ class Conditioning(Event):
 
 
     def run_event(self):
+
+        # TODO: czy sprawdzenie 'len(chamber.loaded) < chamber.max_in' jest poprawne??
+        # TODO: w tym momencie sprawdzamy załadowanie konkretnej komory (komora ma większe cap niż np. te 8) i może się zdażyć że w jednej będzie 14 modułów a w drugiej 2 moduły (suma 16 czyli ok na dwa TR), a na ten moment mamy że musi być 8 + 8.
+        # TODO: może zamiast tego, sprawdzać czy suma wrzuconych modułów jest mniejsza niż maks na TRy i potem czy maks cap (Ale to realne cap TC) TC jest większe od loaded
         l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
             for test in self.pull_from.loaded:
@@ -445,6 +477,9 @@ class Conditioning(Event):
             if item in self.pull_from.loaded:
                 self.pull_from.loaded.remove(item)
 
+        for TC in self.push_to:
+            print(TC.loaded)
+
     def add_to_rdylst(self, test):
         self.rdylst.append(test)
 
@@ -455,8 +490,10 @@ class RSC_TC(RSC):
         self.name = name
         self.temp = temp
         super(RSC_TC, self).__init__()
+
     def set_temp(self, temp):
         self.temp = temp
+
     def set_name(self, name):
         self.name = name
 
@@ -470,6 +507,7 @@ class Deployment(Event):
     #     super(Deployment, self).__init__(*args, **kws)
 
     def run_event(self):
+
         l = []
         for test in Conditioning.rdylst:
             for tr in self.push_to:
@@ -488,8 +526,6 @@ class Deployment(Event):
             for k in range(len(Conditioning.rdylst)):
                 if item in Conditioning.rdylst:
                     Conditioning.rdylst.remove(item)
-
-
 
 
 class RSC_TR(RSC):
@@ -513,6 +549,7 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
     def run_event(self):
+
         # do przeróbyyyyyy
         l, k = [], []
         for tr in self.pull_from: # z listy test roomow
