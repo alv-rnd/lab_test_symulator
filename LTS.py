@@ -48,7 +48,7 @@ class Manage:
         q = day_time / transport_qty
         return q
 
-    def sim_run(self, first_run=True):
+    def sim_run(self):
 
         test_qty = len(self.test_list)
 
@@ -83,7 +83,7 @@ class Manage:
                 #print('condi i frq_check == 2')
 
             # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
-            Analysis(self.TR_list, self.AT_list, 15).run_event()
+            Analysis(self.TR_list, self.AT_list, 15).run_event(check_time)
             print('Alaliza')
             for AT in self.AT_list:
                 self.spotX_on_RSC_loaded(1, AT)
@@ -101,7 +101,6 @@ class Manage:
 
             # Zmieniłem na uruchamianie metody klasy Time, zamiast podbijania jej parametru,
             # wychodząc z tej zasady że jedna klasa nie wpływa na paramy innej klasy bezpośrednio
-
             self.real_time.add_real_time(1)
 
 
@@ -548,18 +547,21 @@ class Analysis(Event):
     '''
     zmiana statusu na finalny, dodanie oceny testu.
     '''
-    def run_event(self):
+
+    def run_event(self, check_time): # jak pobrać czas? to działa ale pycharm podkreśla
 
         # do przeróbyyyyyy
         l, k = [], []
-        for tr in self.pull_from: # z listy test roomow
-            for test in tr.loaded: # z kazdego tr pobierz test
-                self.push_to[0].in_queue.append(test)
-                k.append(test) # i wrzuc do koljki
-            for item in k:
-                for i in range(len(tr.loaded)):
-                    if item in tr.loaded:
-                        tr.loaded.remove(item)
+        print(check_time)
+        if check_time > 0:
+            for tr in self.pull_from:  # z listy test roomow
+                for test in tr.loaded:  # z kazdego tr pobierz test
+                    self.push_to[0].in_queue.append(test)
+                    k.append(test)  # i wrzuc do koljki
+                for item in k:
+                    for i in range(len(tr.loaded)):
+                        if item in tr.loaded:
+                            tr.loaded.remove(item)
 
         for at in self.push_to:
             for test in at.in_queue:
@@ -567,7 +569,7 @@ class Analysis(Event):
                     at.load(test)
                     l.append(test)
                     test.status = 'ANALYSIS'
-                    test.result_eval = random.choice(['OK', 'COK', 'NOK'])
+                    test.result_eval = np.random.choice(['OK', 'COK', 'NOK'], 1, p=[0.7, 0.2, 0.1])
                     self.add_time(test)
                     self.add_to_log(test)
             for item in l:
@@ -575,6 +577,7 @@ class Analysis(Event):
                     if item in at.in_queue:
                         at.in_queue.remove(item)
                         at.finit.append(item)
+
 
 class RSC_Analysis(RSC):
     '''Analysis Tables'''
