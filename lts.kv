@@ -23,7 +23,7 @@
                 text: "Exportuj do excela"
             ActionButton:
                 text: "Ustawienia"
-
+                on_release: app.open_settings()
 
     BoxLayout:
         orientation: "horizontal"
@@ -31,16 +31,142 @@
         BoxLayout:
             orientation: 'vertical'
             size_hint_x: .3
-            Label:
-                borders: 2, 'solid', (1, 1, 1, 1)
-                color: (0, 0, 0, 0)
-                text: "Obszar z parametrami symulacji"
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 1
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
+            TabbedPanel:
+                do_default_tab: False
+                padding: 3
+                TabbedPanelItem:
+                    text: "G³ówne"
+                    BoxLayout:
+                        padding: 2
+                        orientation: 'vertical'
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            spacing: 10
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ testów:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Mo¿na i tak :)"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            spacing: 10
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ komór:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Test Chambers"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            spacing: 10
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ testów:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Mo¿na i tak :)"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            spacing: 10
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ testów:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Mo¿na i tak :)"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            spacing: 10
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ testów:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Mo¿na i tak :)"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+                            size_hint_y: None
+                            height: 35
+                            orientation: 'vertical'
+                            padding: 5
+                            BoxLayout:
+                                Label:
+                                    size_hint_x: .1
+                                Label:
+                                    text: "Iloœæ testów:"
+                                TextInput:
+                                    multiline: False
+                                    hint_text: "Mo¿na i tak :)"
+                                    input_filter: 'int'
+                                    size_font: self.size_hint_y + 2
+                                    text: ""
+                                Label:
+                                    size_hint_x: .4
+                        BoxLayout:
+
+                TabbedPanelItem:
+                    text: "Szczegó³owe 1"
+                    BoxLayout:
+                        Label:
+                            size_hint_x: .3
+                            text: 'min'
+                        Slider:
+                            min: 0
+                            max: 100
+                            orientation: 'horizontal'
+                        Label:
+                            size_hint_x: .3
+                            text: 'max'
+                TabbedPanelItem:
+                    text: "Szczegó³owe 2"
+                    Label:
+                        text: "Zawartoœæ tab 3"
+
             BoxLayout:
                 size_hint_y: .06
                 orientation: 'horizontal'

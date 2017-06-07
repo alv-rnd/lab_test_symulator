@@ -16,7 +16,7 @@ class AutolivActionBar(ActionBar):
     def __init__(self, *args, **kwargs):
         super(AutolivActionBar, self).__init__(**kwargs)
 
-
+        
 
 
 
@@ -41,6 +41,7 @@ class LtsApp(App):
     def build(self):
         self.title = "Symulacja procesu COP"
         Window.maximize()
+        # Config.set("input", "mouse", "mouse, disable_multitouch")
         # Window.clearcolor = get_color_from_hex("#757575")
         return LtsBoxLayout()
 
