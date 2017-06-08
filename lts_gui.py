@@ -3,31 +3,46 @@
 import kivy
 
 from kivy.app import App
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
-from kivy.utils import get_color_from_hex
-from kivy.uix.button import Button
-from kivy.uix.actionbar import ActionBar
+from kivy.uix.textinput import TextInput
+from kivy.properties import ObjectProperty
+# from kivy.utils import get_color_from_hex
 
-class AutolivActionBar(ActionBar):
-    """
+class QuestionPopup(Popup):
 
-    """
+    test_text = "Ilość modułów wyprodukowanych w APA."
+    tc_text = "Ilość komór temperaturowych gdzie będą kondycjonowane moduły."
+    tr_text = "Ilość Test Roomów w których będą odbywać się testy."
+    wich_text = "Ilość komór Walk-in w których będą odbywać się testy."
+    trunk_text = "Ilość transportów z APA na dzień."
+    frq_text = "Częstotliwość dokładania modułów do TC przez technika wsparcia (ustaw 0 jeżeli moduły mają być dokłądane od razu). "
+
+    hints = [test_text, tc_text, tr_text, wich_text, trunk_text, frq_text]
+
+    message = ObjectProperty()
+
     def __init__(self, *args, **kwargs):
-        super(AutolivActionBar, self).__init__(**kwargs)
+        super(QuestionPopup, self).__init__(**kwargs)
 
-        
+    def open(self, where):
+        self.message.text = where
 
-
+        super(QuestionPopup, self).open()
 
 
 class LtsBoxLayout(BoxLayout):
     """
     Główny wygląd programu, zawierają się w nim wszystkie widgety
     """
+
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)
 
+        self.questionpopup = QuestionPopup()
 
 class LtsApp(App):
     """

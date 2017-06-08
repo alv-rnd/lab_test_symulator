@@ -1,12 +1,25 @@
-<CustomButton@Button>:
-#--- customowy button ---#
-    #background_color: ("#000887")
+<CustomTextInput@TextInput>:
+    multiline: False
+    size_hint: 1, None
+    hint_text: "int"
+    input_filter: 'int'
+    text: ""
+    write_tab: False
+
+<CustomLabel@Label>:
+    size_hint: 1, None
+    height: self.texture_size[1] + (self.texture_size[1] / 1.5)
+    text: "None"
+
+<QuestionButton@Button>:
+    size_hint: .3, None
+    text: "?"
 
 <LtsBoxLayout>:
 #---Pasek menu (ActionBar)---#
     orientation: "vertical"
     fullscreen: True
-#    background_color: ("#909090")
+    id: main
 
     ActionBar:
         ActionView:
@@ -29,143 +42,107 @@
         orientation: "horizontal"
 
         BoxLayout:
-            orientation: 'vertical'
+            orientation: "vertical"
             size_hint_x: .3
-            TabbedPanel:
-                do_default_tab: False
-                padding: 3
-                TabbedPanelItem:
-                    text: "G³ówne"
-                    BoxLayout:
-                        padding: 2
-                        orientation: 'vertical'
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            spacing: 10
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ testów:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Mo¿na i tak :)"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            spacing: 10
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ komór:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Test Chambers"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            spacing: 10
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ testów:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Mo¿na i tak :)"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            spacing: 10
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ testów:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Mo¿na i tak :)"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            spacing: 10
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ testów:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Mo¿na i tak :)"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
-                            size_hint_y: None
-                            height: 35
-                            orientation: 'vertical'
-                            padding: 5
-                            BoxLayout:
-                                Label:
-                                    size_hint_x: .1
-                                Label:
-                                    text: "Iloœæ testów:"
-                                TextInput:
-                                    multiline: False
-                                    hint_text: "Mo¿na i tak :)"
-                                    input_filter: 'int'
-                                    size_font: self.size_hint_y + 2
-                                    text: ""
-                                Label:
-                                    size_hint_x: .4
-                        BoxLayout:
 
-                TabbedPanelItem:
-                    text: "Szczegó³owe 1"
+            BoxLayout:
+                orientation: "vertical"
+                padding: 5, 20, 8, 20
+                Label:
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    #halign: 'left'
+                    text: "Ustawienia g³ówne"
+
+                GridLayout:
+                    cols: 4
+                    row_force_default: True
+                    row_default_height: 40
+                    CustomLabel:
+                        id: label_test_qty
+                        text: "Iloœæ testów:"
                     BoxLayout:
-                        Label:
-                            size_hint_x: .3
-                            text: 'min'
-                        Slider:
-                            min: 0
-                            max: 100
-                            orientation: 'horizontal'
-                        Label:
-                            size_hint_x: .3
-                            text: 'max'
-                TabbedPanelItem:
-                    text: "Szczegó³owe 2"
-                    Label:
-                        text: "Zawartoœæ tab 3"
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: test_qty
+                            height: label_test_qty.size[1]
+                            hint_text: "qty"
+                        QuestionButton:
+                            id: test_text
+                            pos: label_test_qty.x, label_test_qty.texture_size[1] / 2
+                            height: label_test_qty.size[1]
+                            on_release: root.questionpopup.open('text_text')
+
+                    CustomLabel:
+                        id: label_tc_qty
+                        text: "Iloœæ Komór:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: tc_qty
+                            height: label_tc_qty.size[1]
+                            hint_text: "qty"
+                        QuestionButton:
+                            id: tc_text
+                            pos: label_tc_qty.x, label_tc_qty.texture_size[1] / 2
+                            height: label_tc_qty.size[1]
+
+                    CustomLabel:
+                        id: label_tr_qty
+                        text: "Iloœæ TR:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: tr_qty
+                            height: label_tr_qty.size[1]
+                            hint_text: "qty"
+                        QuestionButton:
+                            id: tr_text
+                            pos: label_tr_qty.x, label_tr_qty.texture_size[1] / 2
+                            height: label_tr_qty.size[1]
+
+                    CustomLabel:
+                        id: label_wich_qty
+                        text: "Iloœæ WICH:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: wich_qty
+                            height: label_wich_qty.size[1]
+                            hint_text: "qty"
+                        QuestionButton:
+                            id: wich_text
+                            pos: label_wich_qty.x, label_wich_qty.texture_size[1] / 2
+                            height: label_wich_qty.size[1]
+
+                    CustomLabel:
+                        id: label_trunks_qty
+                        text: "Trumny:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: trunks_qty
+                            height: label_trunks_qty.size[1]
+                            hint_text: "qty/day"
+                        QuestionButton:
+                            id: trunk_text
+                            pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
+                            height: label_trunks_qty.size[1]
+
+                    CustomLabel:
+                        id: label_frq_check_in
+                        text: "Wrzuty:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: frq_check_in
+                            height: label_frq_check_in.size[1]
+                            hint_text: "qty/h"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
+                            height: label_frq_check_in.size[1]
+
 
             BoxLayout:
                 size_hint_y: .06
@@ -174,6 +151,18 @@
                     padding: 2
                     Button:
                         text: 'Start'
+
+        Label:
+            size_hint_x: None
+            width: 2
+#            borders: 2, 'solid', (1, 1, 1, 1)
+#            color: (0, 0, 0, 0)
+            canvas.before:
+                Color:
+                    rgba: .2, .2, .2, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
 
         BoxLayout:
             orientation: 'vertical'
@@ -187,7 +176,7 @@
 
                     BoxLayout:
                         size_hint_x: .4
-                        CustomButton:
+                        Button:
                             text: 'DropList z Wykresami'
                 Label:
                     text: 'Screeny z wykresami'
@@ -204,3 +193,28 @@
                     text: 'Param wykres 3'
                 Button:
                     text: 'Param wykres 4'
+
+
+<QuestionPopup>:
+    size_hint: .8, .8
+    title: "Info"
+    title_size: root.height * .05
+    auto_dismiss: False
+    message: message
+    BoxLayout:
+        orientation: "vertical"
+        padding: root.width * .08, root.height * .08
+        specing: min(root.width, root.height) * .08
+        Label:
+            id: message
+            text: "None"
+            halign: "center"
+            markup: True
+            font_size: root.height / 10
+            text_size: self.width, None
+            center_y: .5
+        Button:
+            text: "Close"
+            size_hint: 1, None
+            height: root.height / 8
+            on_release: root.dismiss()
