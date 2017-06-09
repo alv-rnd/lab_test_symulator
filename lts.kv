@@ -74,6 +74,21 @@
                             on_release: root.questionpopup.open('text_text')
 
                     CustomLabel:
+                    # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
+                        id: label_frq_check_in
+                        text: "Czas symulacji:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: frq_check_in
+                            height: label_frq_check_in.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
+                            height: label_frq_check_in.size[1]
+
+                    CustomLabel:
                         id: label_tc_qty
                         text: "Iloœæ Komór:"
                     BoxLayout:
@@ -142,8 +157,85 @@
                             id: frq_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
                             height: label_frq_check_in.size[1]
+                Label:
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    #halign: 'left'
+                    text: "Czasy poszczególnych zdarzeñ"
 
+                GridLayout:
+                    cols: 4
+                    row_force_default: True
+                    row_default_height: 40
+                    CustomLabel:
+                        id: label_transport_time
+                        text: "Czas transportu:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: transport_time
+                            height: label_transport_time.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_transport_time.x, label_transport_time.texture_size[1] / 2
+                            height: label_transport_time.size[1]
 
+                    CustomLabel:
+                        id: label_check_in_time
+                        text: "Czas Check_in:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: check_in_time
+                            height: label_check_in_time.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_check_in_time.x, label_check_in_time.texture_size[1] / 2
+                            height: label_check_in_time.size[1]
+
+                    CustomLabel:
+                        id: label_condi_time
+                        text: "Czas Condi:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: condi_time
+                            height: label_condi_time.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_condi_time.x, label_condi_time.texture_size[1] / 2
+                            height: label_condi_time.size[1]
+
+                    CustomLabel:
+                        id: label_deploy_time
+                        text: "Bum time:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: deploy_time
+                            height: label_deploy_time.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_deploy_time.x, label_deploy_time.texture_size[1] / 2
+                            height: label_deploy_time.size[1]
+
+                    CustomLabel:
+                        id: label_anal_time
+                        text: "Anal time:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: anal_time
+                            height: label_anal_time.size[1]
+                            hint_text: "time"
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_anal_time.x, label_anal_time.texture_size[1] / 2
+                            height: label_anal_time.size[1]
             BoxLayout:
                 size_hint_y: .06
                 orientation: 'horizontal'
@@ -151,6 +243,7 @@
                     padding: 2
                     Button:
                         text: 'Start'
+                        on_release: root.text_print
 
         Label:
             size_hint_x: None

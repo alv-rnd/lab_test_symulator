@@ -44,6 +44,10 @@ class LtsBoxLayout(BoxLayout):
 
         self.questionpopup = QuestionPopup()
 
+    def text_print(self):
+        # TODO: dokończyć pobieranie danych z textinput po naciśnieciu START
+        print(self.ids.test_qty.text)
+
 class LtsApp(App):
     """
     Main program, tutaj dodajemy widgety do uruchomienia
