@@ -3,7 +3,6 @@
     size_hint: 1, None
     hint_text: "int"
     input_filter: 'int'
-    text: ""
     write_tab: False
 
 <CustomLabel@Label>:
@@ -20,6 +19,8 @@
     orientation: "vertical"
     fullscreen: True
     id: main
+    main: main
+    test_qty: test_qty
 
     ActionBar:
         ActionView:
@@ -55,6 +56,7 @@
                     text: "Ustawienia g³ówne"
 
                 GridLayout:
+                ### G³ówne parametry symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40
@@ -67,11 +69,12 @@
                             id: test_qty
                             height: label_test_qty.size[1]
                             hint_text: "qty"
+                            text: "100"
                         QuestionButton:
                             id: test_text
                             pos: label_test_qty.x, label_test_qty.texture_size[1] / 2
                             height: label_test_qty.size[1]
-                            on_release: root.questionpopup.open('text_text')
+                            on_release: root.questionpopup.open("Iloœæ modu³ów wyprodukowanych w APA.")
 
                     CustomLabel:
                     # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
@@ -83,6 +86,7 @@
                             id: frq_check_in
                             height: label_frq_check_in.size[1]
                             hint_text: "time"
+                            text: "0"
                         QuestionButton:
                             id: frq_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
@@ -97,6 +101,7 @@
                             id: tc_qty
                             height: label_tc_qty.size[1]
                             hint_text: "qty"
+                            text: "4"
                         QuestionButton:
                             id: tc_text
                             pos: label_tc_qty.x, label_tc_qty.texture_size[1] / 2
@@ -111,6 +116,7 @@
                             id: tr_qty
                             height: label_tr_qty.size[1]
                             hint_text: "qty"
+                            text: "2"
                         QuestionButton:
                             id: tr_text
                             pos: label_tr_qty.x, label_tr_qty.texture_size[1] / 2
@@ -125,6 +131,7 @@
                             id: wich_qty
                             height: label_wich_qty.size[1]
                             hint_text: "qty"
+                            text: "2"
                         QuestionButton:
                             id: wich_text
                             pos: label_wich_qty.x, label_wich_qty.texture_size[1] / 2
@@ -139,6 +146,7 @@
                             id: trunks_qty
                             height: label_trunks_qty.size[1]
                             hint_text: "qty/day"
+                            text: "3"
                         QuestionButton:
                             id: trunk_text
                             pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
@@ -153,10 +161,17 @@
                             id: frq_check_in
                             height: label_frq_check_in.size[1]
                             hint_text: "qty/h"
+                            text: "120"
                         QuestionButton:
                             id: frq_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
                             height: label_frq_check_in.size[1]
+                    Spinner:
+                        text: "Minuty"
+                        values: ["Minuty", "Godziny", "Dni", "Miesi¹ce", "Lata"]
+                        id: time_format
+                        on_text: root.time_format(time_format.text)
+
                 Label:
                     size_hint_y: None
                     height: self.texture_size[1]
@@ -164,6 +179,7 @@
                     text: "Czasy poszczególnych zdarzeñ"
 
                 GridLayout:
+                ### G³ówne ustawienia czasów symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40
@@ -176,6 +192,7 @@
                             id: transport_time
                             height: label_transport_time.size[1]
                             hint_text: "time"
+                            text: "120"
                         QuestionButton:
                             id: frq_text
                             pos: label_transport_time.x, label_transport_time.texture_size[1] / 2
@@ -190,6 +207,7 @@
                             id: check_in_time
                             height: label_check_in_time.size[1]
                             hint_text: "time"
+                            text: "30"
                         QuestionButton:
                             id: frq_text
                             pos: label_check_in_time.x, label_check_in_time.texture_size[1] / 2
@@ -204,6 +222,7 @@
                             id: condi_time
                             height: label_condi_time.size[1]
                             hint_text: "time"
+                            text: "240"
                         QuestionButton:
                             id: frq_text
                             pos: label_condi_time.x, label_condi_time.texture_size[1] / 2
@@ -218,6 +237,7 @@
                             id: deploy_time
                             height: label_deploy_time.size[1]
                             hint_text: "time"
+                            text: "15"
                         QuestionButton:
                             id: frq_text
                             pos: label_deploy_time.x, label_deploy_time.texture_size[1] / 2
@@ -232,6 +252,7 @@
                             id: anal_time
                             height: label_anal_time.size[1]
                             hint_text: "time"
+                            text: "15"
                         QuestionButton:
                             id: frq_text
                             pos: label_anal_time.x, label_anal_time.texture_size[1] / 2
@@ -243,7 +264,7 @@
                     padding: 2
                     Button:
                         text: 'Start'
-                        on_release: root.text_print
+                        on_release: root.start()
 
         Label:
             size_hint_x: None
@@ -289,7 +310,7 @@
 
 
 <QuestionPopup>:
-    size_hint: .8, .8
+    size_hint: .3, .3
     title: "Info"
     title_size: root.height * .05
     auto_dismiss: False

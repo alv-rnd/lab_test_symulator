@@ -11,15 +11,13 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-
-    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, time_format, frq_check_in,
-                 transport_time, check_in_time, condi_time, deployment_time, analisys_time):
-        self.t_qty = t_qty
-        self.tc_qty = tc_qty
-        self.tc_cap = tc_cap
-        self.tr_qty = tr_qty
-        self.at_qty = at_qty
-        self.frq_check_in = frq_check_in
+    def __init__(self, main_param_lts, event_param_lts, time_format):
+        self.t_qty = main_param_lts[0]
+        self.tc_qty = main_param_lts[1]
+        self.tc_cap = main_param_lts[2]
+        self.tr_qty = main_param_lts[3]
+        self.at_qty = main_param_lts[4]
+        self.frq_check_in = main_param_lts[5]
         self.time_format = time_format
         self.test_list = []
         self.other_RSC =[]
@@ -28,9 +26,9 @@ class Manage:
         self.AT_list = []
         self.ready_list = []
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.at_qty)
-        self.real_time = Time(self.time_format)
-        self.event_time = [transport_time, check_in_time, condi_time, deployment_time, analisys_time]
-        self.log = Log(self.test_list)
+        self.event_time = event_param_lts
+        self.real_time = Time(self.test_list, self.time_format)
+
 
     @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym, może być na około
     def transport_qty(transport_qty, approach=True):
@@ -51,7 +49,6 @@ class Manage:
 
         test_qty = len(self.test_list)
 
-        print(self.log)
         # TODO: kiedy ma być przerwanie whila? na razie dałem param 'more' który może być zmieniony jak ilość wygenerowanych testów będzie równa ilości testów w Fin
         while self.more:
             check_time = self.real_time.check_time()
@@ -232,19 +229,6 @@ class Manage:
         print('Utworzono Stanowiska Analizy AT_1 do AT_%s' %(at_qty))
 
 
-class Log:
-
-    def __init__(self, test_list):
-        self.cols = ['Delivery', 'Trumna', 'Check_in', 'Storage', 'Conditioning', 'TC', 'Deployment', 'TR', 'Analisys', 'AT',
-                'Final', 'Fin_queue', 'kind', 'project', 'temp', 'result']
-        self.test_list = test_list
-        self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
-
-# TODO: dokończyć log
-    def add_to_log(self):
-        pass
-
-
 class Time:
     time_formats = {'min': 1,
                     'hrs': 60,
@@ -253,14 +237,16 @@ class Time:
                     'yer': 397440
                     }
 
-
-    def __init__(self, time_format='min', value=None):
+    def __init__(self, test_list, time_format='min', value=None):
+        self.cols = ['Delivery', 'Trumna', 'Check_in', 'Storage', 'Conditioning',
+                     'TC', 'Deployment', 'TR', 'Analisys', 'AT',
+                     'Final', 'Fin_queue', 'kind', 'project', 'temp', 'result']
+        self.test_list = test_list
         self.time_format = time_format
         self.value = value
         self.time_init = 0
         self.real_time = 0
-
-
+        self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
 
     def add_time_module(self, modulet):
         self.modulet = modulet
@@ -488,6 +474,7 @@ class Conditioning(Event):
             for test in self.pull_from.loaded:
                 for chamber in self.push_to:
                     if test.temp == chamber.temp:
+                        # TODO: if len(self.puch_to) < len(tr_list)*(frq_check_in/deploy_time
                         if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
                             if test not in l:
                                 chamber.load(test)
