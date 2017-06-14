@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 <CustomTextInput@TextInput>:
     multiline: False
     size_hint: 1, None
@@ -53,16 +55,16 @@
                     size_hint_y: None
                     height: self.texture_size[1]
                     #halign: 'left'
-                    text: "Ustawienia g³ówne"
+                    text: "Ustawienia glowne"
 
                 GridLayout:
-                ### G³ówne parametry symulacji ###
+                ### Gï¿½ï¿½wne parametry symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40
                     CustomLabel:
                         id: label_test_qty
-                        text: "Iloœæ testów:"
+                        text: u"Ilosc testow:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -74,7 +76,7 @@
                             id: test_text
                             pos: label_test_qty.x, label_test_qty.texture_size[1] / 2
                             height: label_test_qty.size[1]
-                            on_release: root.questionpopup.open("Iloœæ modu³ów wyprodukowanych w APA.")
+                            on_release: root.questionpopup.open("Ilosc modulow wyprodukowanych w APA.")
 
                     CustomLabel:
                     # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
@@ -94,7 +96,7 @@
 
                     CustomLabel:
                         id: label_tc_qty
-                        text: "Iloœæ Komór:"
+                        text: "Ilosc Komor:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -109,7 +111,7 @@
 
                     CustomLabel:
                         id: label_tr_qty
-                        text: "Iloœæ TR:"
+                        text: "Ilosc TR:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -124,7 +126,7 @@
 
                     CustomLabel:
                         id: label_wich_qty
-                        text: "Iloœæ WICH:"
+                        text: "Ilosc WICH:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -168,7 +170,7 @@
                             height: label_frq_check_in.size[1]
                     Spinner:
                         text: "Minuty"
-                        values: ["Minuty", "Godziny", "Dni", "Miesi¹ce", "Lata"]
+                        values: ["Minuty", "Godziny", "Dni", "MiesiÄ…ce", "Lata"]
                         id: time_format
                         on_text: root.time_format(time_format.text)
 
@@ -176,10 +178,10 @@
                     size_hint_y: None
                     height: self.texture_size[1]
                     #halign: 'left'
-                    text: "Czasy poszczególnych zdarzeñ"
+                    text: "Czasy poszczegolnych zdarzen"
 
                 GridLayout:
-                ### G³ówne ustawienia czasów symulacji ###
+                ### Gï¿½ï¿½wne ustawienia czasï¿½w symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40

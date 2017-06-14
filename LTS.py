@@ -247,6 +247,23 @@ class Time:
         self.time_init = 0
         self.real_time = 0
         self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
+        #self.log = pd.DataFrame(columns=self.cols, index=[test.name for test in self.test_list)
+
+    def add_event_time_log(self, modulet, event, time, rsc, paramy=None, result=None):
+        """
+        Dodawanie informacji do logu przy zmianie statusu
+        :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
+        :param event: nazwa eventu, najlepiej chyba nazwa statusu bo bedzie pod ręką
+        :param time: czas zmiany statusu, real_time
+        :param rsc: lista z dwiema pozycjami, [nazwa rsc w której nastąpiła zmiana statusu, rsc do którego moduł jest wrzucany(np. komora TC2)]
+        :param paramy: lista z parametrami do wpisania, defaultowo None, dokładniej chodzi o [kind, projekt, temp], chyba dodawane przy check_in
+        :param result: ocena, dodawana przy evencie analisys
+        :return: nic
+        """
+        self.log.loc[modulet][event] = time
+        self.log.loc[modulet][rsc[0]] = rsc[1]
+        if paramy:
+            self.log.loc[modulet][12:15] = paramy
 
     def add_time_module(self, modulet):
         self.modulet = modulet
@@ -474,7 +491,8 @@ class Conditioning(Event):
             for test in self.pull_from.loaded:
                 for chamber in self.push_to:
                     if test.temp == chamber.temp:
-                        # TODO: if len(self.puch_to) < len(tr_list)*(frq_check_in/deploy_time
+                        #może coś takiego??
+                        # TODO: if len(self.puch_to) < len(tr_list)*(frq_check_in/deploy_time)
                         if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
                             if test not in l:
                                 chamber.load(test)
