@@ -120,17 +120,8 @@ class Manage:
         #     if tmin%120 == 0: # co 2h wrzucamy do kondycjonowania
         #         Conditioning(storageLAB, self.TC_list, 240, first_run=False(by default))
         #           for tr in self.TR_list:
-        #               for test in tr.loaded:
-        #                   if tmin >= test.time:
-        #                       Analysis(tr.loaded, self.finished)
-        #     if len(rdy_lst) > 0: # moe rdy zapisac w postaci jakiegos
-        #         # static method czy param? coby sie spr z kazda iteracja czasu
-        #         for TR in self.TR_list:
-        #             # tu jakiś ifik spr x pierwszych testów z rdy
-        #             # i jeśli jest ten sam proj to go bierze a nie to pierwszy z brzegu
-        #             # czy cuś w ten deseń
-        #             for test in rdy_lst:
-        #                 Deployment(rdy_lst, self.TR_list, 20)
+        #     Anal()
+        #     Depl()
         #     tmin += 1
 
 
@@ -417,6 +408,7 @@ class Check_in(Event):
         test.project = random.randint(1, self.project_qty + 1)
         # losowanie in/out -> modulet
         test.kind = random.choice(Modulet.ab_kind)
+        np.random.choice()
         test.temp = random.choice([-35, -30, 23, 85, 90])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
         # if str(test.project) in Manage.ratings.keys():
@@ -488,6 +480,8 @@ class Conditioning(Event):
         # TODO: może zamiast tego, sprawdzać czy suma wrzuconych modułów jest mniejsza niż maks na TRy i potem czy maks cap (Ale to realne cap TC) TC jest większe od loaded
         l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
+            # oraz spr czy jest po co wrzucac
+            # (suma po tc.loaded vs len trlist
             for test in self.pull_from.loaded:
                 for chamber in self.push_to:
                     if test.temp == chamber.temp:
@@ -500,7 +494,10 @@ class Conditioning(Event):
                                 l.append(test)
                                 test.status = 'Conditioning'
                                 self.add_to_log(test)
-                                self.add_time(test)
+                                if test.temp != 23:
+                                    self.add_time(test)
+
+
 
         for item in l:
             if item in self.pull_from.loaded:
@@ -579,7 +576,7 @@ class Analysis(Event):
     '''
 
     def run_event(self, check_time): # jak pobrać czas? to działa ale pycharm podkreśla
-
+        check_time
         # do przeróbyyyyyy
         l, k = [], []
         print(check_time)
