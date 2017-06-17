@@ -11,13 +11,13 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-    def __init__(self, main_param_lts, event_param_lts, time_format):
-        self.t_qty = main_param_lts[0]
-        self.tc_qty = main_param_lts[1]
-        self.tc_cap = main_param_lts[2]
-        self.tr_qty = main_param_lts[3]
-        self.at_qty = main_param_lts[4]
-        self.frq_check_in = main_param_lts[5]
+    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in, event_param_lts, time_format):
+        self.t_qty = t_qty
+        self.tc_qty = tc_qty
+        self.tc_cap = tc_cap
+        self.tr_qty = tr_qty
+        self.at_qty = at_qty
+        self.frq_check_in = frq_check_in
         self.time_format = time_format
         self.test_list = []
         self.other_RSC =[]
@@ -417,7 +417,7 @@ class Check_in(Event):
         test.project = random.randint(1, self.project_qty + 1)
         # losowanie in/out -> modulet
         test.kind = random.choice(Modulet.ab_kind)
-        test.temp = random.choice([-35, -30, 23, 85, 90])
+        test.temp = np.random.choice([-35, -30, 23, 85, 90], 1, )
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
         # if str(test.project) in Manage.ratings.keys():
         #     print('kupa')

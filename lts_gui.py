@@ -37,6 +37,9 @@ class QuestionPopup(Popup):
         super(QuestionPopup, self).open()
         # TODO: określić wyjście z popup'a poprzez klawisz Enter
 
+    def enter_close(self):
+        super(QuestionPopup, self).dismiss()
+
 
 class LtsBoxLayout(BoxLayout):
     """
@@ -71,13 +74,21 @@ class LtsBoxLayout(BoxLayout):
         # print(type(self.main_param_lts[0]))
         # print(self.event_param_lts)
 
-        sim = LTS.Manage(self.main_param_lts, self.event_param_lts, self.time_format)
+        sim = LTS.Manage(self.main_param_lts[0],
+                         self.main_param_lts[1],
+                         self.main_param_lts[2],
+                         self.main_param_lts[3],
+                         self.main_param_lts[4],
+                         self.main_param_lts[5],
+                         self.event_param_lts,
+                         self.time_format)
         sim.sim_run()
 
     def time_format(self, value):
         if value == "Minuty":
             self.time_format = "min"
         elif value == "Godziny":
+
             self.time_format = "hrs"
         elif value == "Dni":
             self.time_format = "day"
