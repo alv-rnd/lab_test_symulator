@@ -8,6 +8,7 @@
 <CustomLabel@Label>:
     size_hint: 1, None
     height: self.texture_size[1] + (self.texture_size[1] / 1.5)
+    font_size:
     text: "None"
 
 <QuestionButton@Button>:
@@ -57,13 +58,13 @@
                     text: "Ustawienia glowne"
 
                 GridLayout:
-                ### G³ówne parametry symulacji ###
-                    cols: 4
+                ### G??wne parametry symulacji ###
+                    cols: 2
                     row_force_default: True
                     row_default_height: 40
                     CustomLabel:
                         id: label_test_qty
-                        text: "Iloœæ testów:"
+                        text: "Ilo?? test?w:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -75,7 +76,100 @@
                             id: test_text
                             pos: label_test_qty.x, label_test_qty.texture_size[1] / 2
                             height: label_test_qty.size[1]
-                            on_release: root.questionpopup.open(self.id)
+                            on_release: root.questionpopup.open("test_text")
+
+
+                    CustomLabel:
+                        id: label_tc_qty
+                        text: "Ilosc Komor:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: tc_qty
+                            height: label_tc_qty.size[1]
+                            hint_text: "qty"
+                            text: "4"
+                        QuestionButton:
+                            id: tc_text
+                            pos: label_tc_qty.x, label_tc_qty.texture_size[1] / 2
+                            height: label_tc_qty.size[1]
+                            on_release: root.questionpopup.open("tc_text")
+
+                    CustomLabel:
+                        id: label_tr_qty
+                        text: "Ilosc TR:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: tr_qty
+                            height: label_tr_qty.size[1]
+                            hint_text: "qty"
+                            text: "2"
+                        QuestionButton:
+                            id: tr_text
+                            pos: label_tr_qty.x, label_tr_qty.texture_size[1] / 2
+                            height: label_tr_qty.size[1]
+                            on_release: root.questionpopup.open("tr_text")
+
+                    CustomLabel:
+                        id: label_wich_qty
+                        text: "Ilosc WICH:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: wich_qty
+                            height: label_wich_qty.size[1]
+                            hint_text: "qty"
+                            text: "2"
+                        QuestionButton:
+                            id: wich_text
+                            pos: label_wich_qty.x, label_wich_qty.texture_size[1] / 2
+                            height: label_wich_qty.size[1]
+                            on_release: root.questionpopup.open("wich_text")
+
+                    CustomLabel:
+                        id: label_trunks_qty
+                        text: "Trumny:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: trunks_qty
+                            height: label_trunks_qty.size[1]
+                            hint_text: "qty/day"
+                            text: "3"
+                        QuestionButton:
+                            id: trunk_text
+                            pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
+                            height: label_trunks_qty.size[1]
+                            on_release: root.questionpopup.open("trunk_text")
+
+                    CustomLabel:
+                        id: label_frq_check_in
+                        text: "Wrzuty:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        BoxLayout:
+                            id: frq_check_in_box
+                            CustomTextInput:
+                                id: frq_check_in
+                                height: label_frq_check_in.size[1]
+                                hint_text: "qty/h"
+                                text: "120"
+                            Spinner:
+                                text: "Minuty"
+                                values: ["Minuty", "Godziny", "Dni", "Miesi?ce", "Lata"]
+                                size_hint_y: None
+                                height: label_frq_check_in.size[1]
+                                width: frq_check_in_box.size[0] / 2
+
+                                id: time_format
+                                on_text: root.time_format(time_format.text)
+                        QuestionButton:
+                            id: frq_text
+                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
+                            height: label_frq_check_in.size[1]
+                            on_release: root.questionpopup.open("frq_text")
+
 
                     CustomLabel:
                     # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
@@ -92,86 +186,7 @@
                             id: frq_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
                             height: label_frq_check_in.size[1]
-
-                    CustomLabel:
-                        id: label_tc_qty
-                        text: "Ilosc Komor:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: tc_qty
-                            height: label_tc_qty.size[1]
-                            hint_text: "qty"
-                            text: "4"
-                        QuestionButton:
-                            id: tc_text
-                            pos: label_tc_qty.x, label_tc_qty.texture_size[1] / 2
-                            height: label_tc_qty.size[1]
-
-                    CustomLabel:
-                        id: label_tr_qty
-                        text: "Ilosc TR:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: tr_qty
-                            height: label_tr_qty.size[1]
-                            hint_text: "qty"
-                            text: "2"
-                        QuestionButton:
-                            id: tr_text
-                            pos: label_tr_qty.x, label_tr_qty.texture_size[1] / 2
-                            height: label_tr_qty.size[1]
-
-                    CustomLabel:
-                        id: label_wich_qty
-                        text: "Ilosc WICH:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: wich_qty
-                            height: label_wich_qty.size[1]
-                            hint_text: "qty"
-                            text: "2"
-                        QuestionButton:
-                            id: wich_text
-                            pos: label_wich_qty.x, label_wich_qty.texture_size[1] / 2
-                            height: label_wich_qty.size[1]
-
-                    CustomLabel:
-                        id: label_trunks_qty
-                        text: "Trumny:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: trunks_qty
-                            height: label_trunks_qty.size[1]
-                            hint_text: "qty/day"
-                            text: "3"
-                        QuestionButton:
-                            id: trunk_text
-                            pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
-                            height: label_trunks_qty.size[1]
-
-                    CustomLabel:
-                        id: label_frq_check_in
-                        text: "Wrzuty:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: frq_check_in
-                            height: label_frq_check_in.size[1]
-                            hint_text: "qty/h"
-                            text: "120"
-                        QuestionButton:
-                            id: frq_text
-                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
-                            height: label_frq_check_in.size[1]
-                    Spinner:
-                        text: "Minuty"
-                        values: ["Minuty", "Godziny", "Dni", "Miesi¹ce", "Lata"]
-                        id: time_format
-                        on_text: root.time_format(time_format.text)
+                            on_release: root.questionpopup.open("frq_text")
 
                 Label:
                     size_hint_y: None
@@ -181,7 +196,7 @@
 
                 GridLayout:
                 ### G??wne ustawienia czas?w symulacji ###
-                    cols: 4
+                    cols: 2
                     row_force_default: True
                     row_default_height: 40
                     CustomLabel:
@@ -304,9 +319,9 @@
                     Graph_1:
                         id: graph_1_kv
                         name: "graph_1"
-                    Graph_2:
+                    Graph_2_Screen:
                         id: graph_2_kv
-                        name: "graph_2"
+                        name: "graph_2_screen"
                     Graph_3:
                         id: graph_3_kv
                         name: "graph_3"
@@ -328,46 +343,51 @@
                     text: 'Param wykres 4'
 
 
-<Graph_1@Screen>:
+<Graph_1>:
     id: graph_1_kv
-    Label:
-        text: "Wykres 1"
 
-<Graph_2@Screen>:
+
+<Graph_2_Screen>:
     id: graph_2_kv
-    Label:
-        text: "Wykres 2"
+    Graph_2:
 
-<Graph_3@Screen>:
+
+
+<Graph_3>:
     id: graph_3_kv
     Label:
         text: "Wykres 3"
 
-<Graph_4@Screen>:
+<Graph_4>:
     id: graph_4_kv
     Label:
         text: "Wykres 4"
 
 <QuestionPopup>:
-    size_hint: .3, .3
+    size_hint: 0.3, None
+    height: popup_content.height + 50
     title: "Info"
-    title_size: root.height * .05
+    title_size: 25
     auto_dismiss: False
     message: message
     BoxLayout:
         orientation: "vertical"
+        id: popup_content
+        size_hint: 1, None
+        height: self.width
         padding: root.width * .08, root.height * .08
         specing: min(root.width, root.height) * .08
         Label:
             id: message
             text: "None"
             halign: "center"
+            size_hint_y: None
+            height: self.texture_size[1]
+            text_size: (self.width, self.texture_size[1])
+            #font_size: '40dp'
             markup: True
-            font_size: root.height / 10
-            text_size: self.width, None
-            center_y: .5
         Button:
             text: "Close"
             size_hint: 1, None
-            height: root.height / 8
+            height: '40dp'
             on_release: root.dismiss()
