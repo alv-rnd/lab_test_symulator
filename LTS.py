@@ -11,13 +11,14 @@ class Manage:
     '''
     Klasa zarządzająca wszytkim
     '''
-    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in, event_param_lts, time_format):
+    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in, all_day, event_param_lts, time_format):
         self.t_qty = t_qty
         self.tc_qty = tc_qty
         self.tc_cap = tc_cap
         self.tr_qty = tr_qty
         self.at_qty = at_qty
         self.frq_check_in = frq_check_in
+        self.all_day = all_day
         self.time_format = time_format
         self.test_list = []
         self.other_RSC =[]
@@ -55,7 +56,7 @@ class Manage:
             print(check_time)
             # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
             # podzielny przez wartość która zwraca 'transport_qty'
-            if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
+            if check_time == 0 or check_time % Manage.transport_qty(3, approach=self.all_day) == 0:
                 Transport(self.test_list, self.other_RSC[0], self.event_time[0]).run_event()
                 print('Transport')
                 self.spotX_on_RSC_loaded(10, self.other_RSC[0])
@@ -405,10 +406,11 @@ class Check_in(Event):
 
     def gen_rand_testparam(self, test):
         # funkcja losujaca parametry testów
-        test.project = random.randint(1, self.project_qty + 1)
+        test.project = random.randint(1, self.project_qty)
+
         # losowanie in/out -> modulet
         test.kind = random.choice(Modulet.ab_kind)
-        test.temp = np.random.choice([-35, -30, 23, 85, 90], 1, )
+        test.temp = np.random.choice([-35, -30, 23, 60, 85, 90], 1, p=[0.25, 0.15, 0.25, 0.03, 0.25, 0.07])
         #tu ewentualnie obsługa ratingów, tylko gdzie je zapisywać?
         # if str(test.project) in Manage.ratings.keys():
         #     print('kupa')

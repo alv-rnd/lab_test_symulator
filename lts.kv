@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 <CustomTextInput@TextInput>:
     multiline: False
     size_hint: 1, None
@@ -22,7 +20,8 @@
     fullscreen: True
     id: main
     main: main
-    test_qty: test_qty
+    graphs_screens_py: graphs_screens_kv
+    screen_text_py: screen_text_kv
 
     ActionBar:
         ActionView:
@@ -58,13 +57,13 @@
                     text: "Ustawienia glowne"
 
                 GridLayout:
-                ### Gï¿½ï¿½wne parametry symulacji ###
+                ### G³ówne parametry symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40
                     CustomLabel:
                         id: label_test_qty
-                        text: u"Ilosc testow:"
+                        text: "Iloœæ testów:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -76,7 +75,7 @@
                             id: test_text
                             pos: label_test_qty.x, label_test_qty.texture_size[1] / 2
                             height: label_test_qty.size[1]
-                            on_release: root.questionpopup.open("Ilosc modulow wyprodukowanych w APA.")
+                            on_release: root.questionpopup.open(self.id)
 
                     CustomLabel:
                     # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
@@ -170,7 +169,7 @@
                             height: label_frq_check_in.size[1]
                     Spinner:
                         text: "Minuty"
-                        values: ["Minuty", "Godziny", "Dni", "MiesiÄ…ce", "Lata"]
+                        values: ["Minuty", "Godziny", "Dni", "Miesi¹ce", "Lata"]
                         id: time_format
                         on_text: root.time_format(time_format.text)
 
@@ -181,7 +180,7 @@
                     text: "Czasy poszczegolnych zdarzen"
 
                 GridLayout:
-                ### Gï¿½ï¿½wne ustawienia czasï¿½w symulacji ###
+                ### G??wne ustawienia czas?w symulacji ###
                     cols: 4
                     row_force_default: True
                     row_default_height: 40
@@ -289,13 +288,31 @@
                     padding: 2
                     size_hint_y: .05
                     Label:
+                        id: screen_text_kv
+                        text: ""
 
                     BoxLayout:
                         size_hint_x: .4
-                        Button:
-                            text: 'DropList z Wykresami'
-                Label:
-                    text: 'Screeny z wykresami'
+                        Spinner:
+                            text: "Wykres"
+                            values: ["Wykres 1", "Wykres 2", "Wykres 3", "Wykres 4"]
+                            id: graphs_spinner_kv
+                            on_text: root.change_screen(graphs_spinner_kv.text)
+
+                ScreenManager:
+                    id: graphs_screens_kv
+                    Graph_1:
+                        id: graph_1_kv
+                        name: "graph_1"
+                    Graph_2:
+                        id: graph_2_kv
+                        name: "graph_2"
+                    Graph_3:
+                        id: graph_3_kv
+                        name: "graph_3"
+                    Graph_4:
+                        id: graph_4_kv
+                        name: "graph_4"
 
             BoxLayout:
                 size_hint_y: .06
@@ -310,6 +327,26 @@
                 Button:
                     text: 'Param wykres 4'
 
+
+<Graph_1@Screen>:
+    id: graph_1_kv
+    Label:
+        text: "Wykres 1"
+
+<Graph_2@Screen>:
+    id: graph_2_kv
+    Label:
+        text: "Wykres 2"
+
+<Graph_3@Screen>:
+    id: graph_3_kv
+    Label:
+        text: "Wykres 3"
+
+<Graph_4@Screen>:
+    id: graph_4_kv
+    Label:
+        text: "Wykres 4"
 
 <QuestionPopup>:
     size_hint: .3, .3
