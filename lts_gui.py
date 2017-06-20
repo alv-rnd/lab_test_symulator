@@ -6,6 +6,7 @@ import LTS
 
 import numpy as np
 import math
+import pandas as pd
 
 from kivy.app import App
 from kivy.uix.popup import Popup
@@ -46,62 +47,54 @@ class Graph_1(Screen):
         def resize(event):
             print('resize from mpl ', event)
 
-        self.N = 5
-        self.menMeans = (20, 35, 30, 35, 27)
-        self.menStd = (2, 3, 4, 1, 2)
+    fig = plt.figure()
+    figure = fig
+    ax1 = plt.subplot2grid((1, 1), (0, 0))
 
-        self.ind = np.arange(self.N)  # the x locations for the groups
-        self.width = 0.35  # the width of the bars
+    df = pd.read_csv('world_bank.csv')
+    print(df.columns[4:])
+    ax1.plot_date(df.columns[4:], df.iloc[0][4:], '-', label="Kasz")
+    for label in ax1.xaxis.get_ticklabels():
+        label.set_rotation(45)
+    ax1.grid(True)
 
-        self.fig, self.ax = plt.subplots()
-        rects1 = self.ax.bar(self.ind, self.menMeans, self.width, color='r', yerr=self.menStd)
+    plt.xlabel('Year')
+    plt.ylabel('Kasz')
+    plt.title('Wykres kaszu dla Polski na przestrzeni lat')
+    plt.legend()
+    plt.subplots_adjust(left=0.09, bottom=0.20, right=0.94, top=0.90, wspace=0.2, hspace=0)
 
-        # add some text for labels, title and axes ticks
-        self.ax.set_ylabel('Scores')
-        self.ax.set_title('Scores by group and gender')
-        self.ax.set_xticks(self.ind + self.width)
-        self.ax.set_xticklabels(('G1', 'G2', 'G3', 'G4', 'G5'))
+    plt.show()
 
-        def autolabel(rects):
-            # attach some text labels
-            for rect in rects:
-                height = rect.get_height()
-                self.ax.text(rect.get_x() + rect.get_width() / 2., 1.05 * height,
-                        '%d' % int(height), ha='center', va='bottom')
-
-        self.fig.canvas.mpl_connect('button_press_event', press)
-        self.fig.canvas.mpl_connect('button_release_event', release)
-        self.fig.canvas.mpl_connect('resize_event', resize)
-
-        grp = FigureCanvasKivyAgg(self.fig)
-        grp.draw()
 
 class Graph_2_Screen(Screen):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Graph_2_Screen, self).__init__(**kwargs)
+
 
 class Graph_2(Graph):
-
 
     def __init__(self, *args, **kwargs):
         super(Graph_2, self).__init__(**kwargs)
 
-        self.xlabel="X"
-        self.ylabel="Y"
-        self.x_ticks_minor=5
-        self.x_ticks_major=25
-        self.y_ticks_major=1
-        self.y_grid_label=True
-        self.x_grid_label=True
-        self.padding=5
-        self.x_grid=True
-        self.y_grid=True
-        self.xmin=-0
-        self.xmax=100
-        self.ymin=-1
-        self.ymax=1
-        self.plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self.plot.points = [(x, math.sin(x / 10.)) for x in range(0, 101)]
+        self.xlabel= 'Qty'
+        self.ylabel= 'T'
+        self.x_ticks_minor= 5
+        self.x_ticks_major= 25
+        self.y_ticks_major= 1
+        self.y_grid_label= True
+        self.x_grid_label= True
+        self.padding= 5
+        self.x_grid= True
+        self.y_grid= True
+        self.xmin= -0
+        self.xmax= 100
+        self.ymin= -1
+        self.ymax= 1
+        self.plot = MeshLinePlot(color=[1, 1, 1, 1])
+        self.plot.points = [(x, math.sin(x / 10.)) for x in range(-0, 101)]
         self.add_plot(self.plot)
+
 
 class Graph_3(Screen):
     def __init__(self, *args, **kwargs):
@@ -152,6 +145,7 @@ class LtsBoxLayout(BoxLayout):
     main = ObjectProperty()
     graphs_screens_py = ObjectProperty()
     screen_text_py = ObjectProperty()
+
 
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)

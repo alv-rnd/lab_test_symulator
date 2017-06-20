@@ -146,7 +146,7 @@ class Graph(Widget):
     '''Label options that will be passed to `:class:`kivy.uix.Label`.
     '''
 
-    _with_stencilbuffer = BooleanProperty(True)
+    _with_stencilbuffer = BooleanProperty(False)
     '''Whether :class:`Graph`'s FBO should use FrameBuffer (True) or not (False).
 
     .. warning:: This property is internal and so should be used with care. It can break
