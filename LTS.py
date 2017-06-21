@@ -80,16 +80,18 @@ class Manage:
                     self.spotX_on_RSC_loaded(10, TC)
                 #print('condi i frq_check == 2')
 
+
             # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
-            Analysis(self.TR_list, self.AT_list, self.event_time[4]).run_event(check_time)
-            print('Alaliza')
-            for AT in self.AT_list:
-                self.spotX_on_RSC_loaded(1, AT)
-            # Uruchomienie eventu Deployment
-            Deployment(self.TC_list, self.TR_list, self.event_time[3]).run_event()
-            print('TR')
-            for TR in self.TR_list:
-                self.spotX_on_RSC_loaded(1, TR)
+            if self.real_time > 0:
+                Analysis(self.TR_list, self.AT_list, self.event_time[4]).run_event()
+                print('Alaliza')
+                for AT in self.AT_list:
+                    self.spotX_on_RSC_loaded(1, AT)
+                # Uruchomienie eventu Deployment
+                Deployment(self.TC_list, self.TR_list, self.event_time[3]).run_event()
+                print('TR')
+                for TR in self.TR_list:
+                    self.spotX_on_RSC_loaded(1, TR)
 
             # Sprawdzenie czy ilość testów podana na początku jest równa ilości testów w kolejce Fin
             if test_qty == len(RSC_Analysis.finit) and test_qty != 0:
@@ -576,20 +578,19 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
 
-    def run_event(self, check_time): # jak pobrać czas? to działa ale pycharm podkreśla
-        check_time
+    def run_event(self): # jak pobrać czas? to działa ale pycharm podkreśla
+
         # do przeróbyyyyyy
         l, k = [], []
-        print(check_time)
-        if check_time > 0:
-            for tr in self.pull_from:  # z listy test roomow
-                for test in tr.loaded:  # z kazdego tr pobierz test
-                    self.push_to[0].in_queue.append(test)
-                    k.append(test)  # i wrzuc do koljki
-                for item in k:
-                    for i in range(len(tr.loaded)):
-                        if item in tr.loaded:
-                            tr.loaded.remove(item)
+
+        for tr in self.pull_from:  # z listy test roomow
+            for test in tr.loaded:  # z kazdego tr pobierz test
+                self.push_to[0].in_queue.append(test)
+                k.append(test)  # i wrzuc do koljki
+            for item in k:
+                for i in range(len(tr.loaded)):
+                    if item in tr.loaded:
+                        tr.loaded.remove(item)
 
         for at in self.push_to:
             for test in at.in_queue:
