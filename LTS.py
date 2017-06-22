@@ -75,8 +75,10 @@ class Manage:
             # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
             # podzielny przez wartość która zwraca 'transport_qty'
             if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
+                print('Transport', check_time)
                 Transport().run_event(self.test_list, self.other_RSC[0], self.event_time[0], self.real_time.check_time())
-
+            if  check_time != 0 and (check_time == self.event_time[0] or check_time % (Manage.transport_qty(3)+ self.event_time[0]) == 0):
+                print('Check_in', check_time)
                 Check_in().run_event(self.other_RSC[0], self.other_RSC[1], self.event_time[1], self.real_time.check_time())
 
             # Uruchamianie Eventu Conditioning, musi być najpierw sprawdzenie czy frq_check_in jest równy 0,
@@ -102,7 +104,7 @@ class Manage:
 
             # albo jezeli czas jest równy czasowi podanemu przez użytkownika (wtedy test_qty == 0)
             # na razie to dla mnie żeby nie czekać całej kolejki testów
-            elif check_time == 100:
+            elif check_time == 240:
                 break
 
             # Zmieniłem na uruchamianie metody klasy Time, zamiast podbijania jej parametru,
@@ -175,7 +177,7 @@ class Manage:
         #cdn
 
     def gen_Trunk(self):
-        trumna = RSC_trunk('TrumnaAPA')
+        trumna = RSC_trunk('TrumnaAPA', 50)
         self.other_RSC.append(trumna)
         print('Utworzono TrumnaAPA')
         return None
@@ -272,7 +274,7 @@ class Event:
     #     self.real_time.add_event_time_log(modulet, event, time, rsc)
 
 
-    def add_event_time_log(self, modulet, time_name, event_time, rsc, paramy=None, result=None,  real_time=0, transport=False):
+    def add_event_time_log(self, modulet, time_name, event_time, rsc, real_time, paramy=None, result=None, transport=False):
         """
         Dodawanie informacji do logu przy zmianie statusu
         :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
@@ -286,12 +288,12 @@ class Event:
 
         if transport:
             log.loc[modulet.name]['Time_0'] = real_time
-        log.loc[modulet.name][time_name] = event_time + int(log[modulet.name][list(log.columns).index(time_name) - 2])
+        log.loc[modulet.name][time_name] = event_time + real_time
         log.loc[modulet.name][rsc[0]] = rsc[1]
-        if paramy:
-            log.loc[modulet.name][13:16] = paramy
-        if result:
-            log.loc[modulet.name][17] = result
+        # if paramy:
+        #     log.loc[modulet.name][13:16] = paramy
+        # if result:
+        #     log.loc[modulet.name][17] = result
 
 
 class RSC:
@@ -346,7 +348,7 @@ class Transport(Event):
         def run_update_tparams():
             t = self.pull_from.pop(0)
             t.status = 'Delivery'
-            self.add_event_time_log(t, 'Time_1', self.event_time, [t.status, self.push_to.name], transport=True, real_time=self.real_time)
+            self.add_event_time_log(t, 'Time_1', self.event_time, [t.status, self.push_to.name], self.real_time, transport=True)
             self.push_to.load(t)
             self.add_time(t, self.event_time)
 
@@ -403,7 +405,7 @@ class Check_in(Event):
         return test.project, test.kind, test.temp
 
 
-    def run_event(self, pull_from, push_to, event_time, module_qty=False):
+    def run_event(self, pull_from, push_to, event_time, real_time, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
@@ -413,11 +415,13 @@ class Check_in(Event):
         self.pull_from = pull_from
         self.push_to = push_to
         self.event_time = event_time
+        self.real_time = real_time
+
 
         def run_update_tparams():
             t = self.pull_from.loaded.pop(0)
             t.status = 'Check_in' # updateujemy status
-            self.add_event_time_log(t, 'Time_2', self.event_time, [t.status, self.push_to.name], paramy=self.gen_rand_testparam(t))   # updatujemy logi
+            self.add_event_time_log(t, 'Time_2', self.event_time, [t.status, self.push_to.name], self.real_time, paramy=self.gen_rand_testparam(t))   # updatujemy logi
             self.push_to.load(t)  # przenosimy miedzy zasobami
             self.add_time(t, self.event_time)      # updateujemy self.time modulu
 
@@ -459,11 +463,12 @@ class Conditioning(Event):
 
     rdylst = []
 
-    def run_event(self, pull_from, push_to, event_time, ):
+    def run_event(self, pull_from, push_to, event_time, real_time):
 
         self.pull_from = pull_from
         self.push_to = push_to
         self.event_time = event_time
+        self.real_time = real_time
 
         # TODO: czy sprawdzenie 'len(chamber.loaded) < chamber.max_in' jest poprawne??
         # TODO: w tym momencie sprawdzamy załadowanie konkretnej komory (komora ma większe cap niż np. te 8) i może się zdażyć że w jednej będzie 14 modułów a w drugiej 2 moduły (suma 16 czyli ok na dwa TR), a na ten moment mamy że musi być 8 + 8.
@@ -484,7 +489,7 @@ class Conditioning(Event):
                                 l.append(test)
                                 test.status = 'Conditioning'
                                 self.add_event_time_log(test, 'Time_3', self.event_time,
-                                                        [test.status, self.push_to.name])
+                                                        [test.status, chamber.name], self.real_time)
                                 if test.temp != 23:
                                     self.add_time(test, self.event_time)
 
@@ -521,11 +526,12 @@ class Deployment(Event):
     #     super(Deployment, self).__init__(*args, **kws)
 
 
-    def run_event(self, pull_from, push_to, event_time, ):
+    def run_event(self, pull_from, push_to, event_time, real_time):
 
         self.pull_from = pull_from
         self.push_to = push_to
         self.event_time = event_time
+        self.real_time = real_time
 
         l = []
         for test in Conditioning.rdylst:
@@ -536,7 +542,7 @@ class Deployment(Event):
                     test.status = 'DEPLOYMENT'
                     self.add_time(test, self.event_time)
                     self.add_event_time_log(test, test.status, self.event_time,
-                                            [test.status, self.push_to.name])
+                                            [test.status, tr.name], self.real_time)
 
         for item in l:
             for j in range(len(self.pull_from)):
@@ -569,7 +575,7 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
 
-    def run_event(self, pull_from, push_to, event_time, ): # jak pobrać czas? to działa ale pycharm podkreśla
+    def run_event(self, pull_from, push_to, event_time, real_time): # jak pobrać czas? to działa ale pycharm podkreśla
 
         # do przeróbyyyyyy
         l, k = [], []
@@ -577,6 +583,7 @@ class Analysis(Event):
         self.pull_from = pull_from
         self.push_to = push_to
         self.event_time = event_time
+        self.real_time = real_time
 
         for tr in self.pull_from:  # z listy test roomow
             for test in tr.loaded:  # z kazdego tr pobierz test
@@ -595,7 +602,7 @@ class Analysis(Event):
                     test.status = 'ANALYSIS'
                     test.result_eval = np.random.choice(['OK', 'COK', 'NOK'], 1, p=[0.7, 0.2, 0.1])
                     self.add_time(test, self.event_time)
-                    self.add_event_time_log(test, test.status, self.event_time, [test.status, self.push_to.name], result=test.result_eval)
+                    self.add_event_time_log(test, test.status, self.event_time, [test.status, at.name], self.real_time, result=test.result_eval)
             for item in l:
                 for j in range(len(at.in_queue)):
                     if item in at.in_queue:
