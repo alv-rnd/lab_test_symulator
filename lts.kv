@@ -98,6 +98,22 @@
                             on_release: root.questionpopup.open("tc_text")
 
                     CustomLabel:
+                        id: label_tc_cap
+                        text: "Pojemnoœæ komór:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: tc_cap
+                            height: label_tc_qty.size[1]
+                            hint_text: "cap"
+                            text: "20"
+                        QuestionButton:
+                            id: tc_cap_text
+                            pos: label_tc_cap.x, label_tc_cap.texture_size[1] / 2
+                            height: label_tc_cap.size[1]
+                            on_release: root.questionpopup.open("tc_cap_text")
+
+                    CustomLabel:
                         id: label_tr_qty
                         text: "Ilosc TR:"
                     BoxLayout:
@@ -144,6 +160,22 @@
                             pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
                             height: label_trunks_qty.size[1]
                             on_release: root.questionpopup.open("trunk_text")
+
+                    CustomLabel:
+                        id: label_at_qty
+                        text: "Iloœæ AT:"
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        CustomTextInput:
+                            id: at_qty
+                            height: label_at_qty.size[1]
+                            hint_text: "qty"
+                            text: "4"
+                        QuestionButton:
+                            id: at_qty_text
+                            pos: label_at_qty.x, label_at_qty.texture_size[1] / 2
+                            height: label_at_qty.size[1]
+                            on_release: root.questionpopup.open("at_qty_text")
 
                     CustomLabel:
                         id: label_frq_check_in

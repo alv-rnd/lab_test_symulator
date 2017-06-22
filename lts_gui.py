@@ -52,7 +52,7 @@ class Graph_1(Screen):
     ax1 = plt.subplot2grid((1, 1), (0, 0))
 
     df = pd.read_csv('world_bank.csv')
-    print(df.columns[4:])
+    # print(df.columns[4:])
     ax1.plot_date(df.columns[4:], df.iloc[0][4:], '-', label="Kasz")
     for label in ax1.xaxis.get_ticklabels():
         label.set_rotation(45)
@@ -150,7 +150,7 @@ class LtsBoxLayout(BoxLayout):
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)
         self.questionpopup = QuestionPopup()
-        self.main_param = ['test_qty', 'frq_check_in', 'tc_qty', 'tr_qty', 'wich_qty', 'trunks_qty', 'frq_check_in']
+        self.main_param = ['test_qty', 'tc_qty', 'tc_cap', 'tr_qty', 'wich_qty', 'trunks_qty', 'at_qty', 'frq_check_in']
         self.event_param = ['transport_time', 'check_in_time', 'condi_time', 'deploy_time', 'anal_time']
         self.main_param_lts = []
         self.event_param_lts = []
@@ -185,6 +185,7 @@ class LtsBoxLayout(BoxLayout):
                          self.main_param_lts[4],
                          self.main_param_lts[5],
                          self.main_param_lts[6],
+                         self.main_param_lts[7],
                          self.event_param_lts,
                          self.time_format)
         sim.sim_run()
