@@ -69,8 +69,9 @@ class Manage:
             # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
             # podzielny przez wartość która zwraca 'transport_qty'
             if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
-                Transport().run_event(self.test_list, self.other_RSC[0], self.event_time[0])
+                Transport().run_event(self.test_list, self.other_RSC[0], self.event_time[0], self.real_time.check_time())
                 print('Transport')
+                print(log)
                 self.spotX_on_RSC_loaded(10, self.other_RSC[0])
                 Check_in().run_event(self.other_RSC[0], self.other_RSC[1], self.event_time[1])
                 print('Check_in')
@@ -255,21 +256,7 @@ class Time:
         # self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
         #self.log = pd.DataFrame(columns=self.cols, index=[test.name for test in self.test_list)
 
-    # def add_event_time_log(self, modulet, event, time, rsc, paramy=None, result=None):
-    #     """
-    #     Dodawanie informacji do logu przy zmianie statusu
-    #     :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
-    #     :param event: nazwa eventu, najlepiej chyba nazwa statusu bo bedzie pod ręką
-    #     :param time: czas zmiany statusu, real_time
-    #     :param rsc: lista z dwiema pozycjami, [nazwa rsc w której nastąpiła zmiana statusu, rsc do którego moduł jest wrzucany(np. komora TC2)]
-    #     :param paramy: lista z parametrami do wpisania, defaultowo None, dokładniej chodzi o [kind, projekt, temp], chyba dodawane przy check_in
-    #     :param result: ocena, dodawana przy evencie analisys
-    #     :return: nic
-    #     """
-    #     self.log.loc[modulet][event] = time
-    #     self.log.loc[modulet][rsc[0]] = rsc[1]
-    #     if paramy:
-    #         self.log.loc[modulet][12:15] = paramy
+
 
     def add_time_module(self, modulet):
         self.modulet = modulet
@@ -288,42 +275,31 @@ class Time:
 
 
 class Event:
-    pass
-    # def add_time(self, module):
-    #     # uzywana w run_event do zmiany czasu odwoluje sie do
-    #     # funkcji o tej samej nazwie w Modulet
-    #     module.add_time(self.event_time)
+
+    def add_time(self, module, event_time):
+        # uzywana w run_event do zmiany czasu odwoluje sie do
+        # funkcji o tej samej nazwie w Modulet
+        module.add_time(event_time)
 
     # def add_to_log(self, modulet, event, time, rsc, ):
     #     self.real_time.add_event_time_log(modulet, event, time, rsc)
 
 
-    # def run_event(self, pull_from, push_to, event_time):
-    #     # dodaje do kontenera klasy RSC elementy z listy zrodlowej
-    #     # zaczynając od poczatku listy
-    #     # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
-    #     # dla poszczegolnych eventów. W przypadku uzycia argumentu
-    #     # module_qty narzucony jest limit przenoszonych testów
-    #     self.pull_from = pull_from
-    #     self.push_to = push_to
-    #     self.event_time = event_time
-    #
-    #     def run_update_tparams():
-    #         t = self.pull_from.loaded.pop(0)
-    #
-    #
-    #
-    #         self.add_to_log(t)
-    #         self.push_to.load(t)
-    #         self.add_time(t)
-    #
-    #     if self.push_to.max_in == False:
-    #         while len(self.pull_from.loaded) > 0:
-    #             run_update_tparams()
-    #     else:
-    #         while len(self.pull_from.loaded) > 0 and \
-    #                 self.push_to.max_in - len(self.push_to.loaded) > 0:
-    #             run_update_tparams()
+    def add_event_time_log(self, modulet, event, time, rsc, paramy=None, result=None):
+        """
+        Dodawanie informacji do logu przy zmianie statusu
+        :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
+        :param event: nazwa eventu, najlepiej chyba nazwa statusu bo bedzie pod ręką
+        :param time: czas zmiany statusu, real_time
+        :param rsc: lista z dwiema pozycjami, [nazwa rsc w której nastąpiła zmiana statusu, rsc do którego moduł jest wrzucany(np. komora TC2)]
+        :param paramy: lista z parametrami do wpisania, defaultowo None, dokładniej chodzi o [kind, projekt, temp], chyba dodawane przy check_in
+        :param result: ocena, dodawana przy evencie analisys
+        :return: nic
+        """
+        log.loc[modulet.name][event] = time
+        log.loc[modulet.name][rsc[0]] = rsc[1]
+        if paramy:
+            log.loc[modulet.name][12:15] = paramy
 
 
 class RSC:
@@ -362,9 +338,7 @@ class Transport(Event):
     # def __init__(self, *args):
     #     super(Transport, self).__init__(*args)
 
-    print(log)
-
-    def run_event(self, pull_from, push_to, event_time):
+    def run_event(self, pull_from, push_to, event_time, real_time):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
@@ -373,14 +347,15 @@ class Transport(Event):
         self.pull_from = pull_from
         self.push_to = push_to
         self.event_time = event_time
+        self.real_time = real_time
 
 
         def run_update_tparams():
             t = self.pull_from.pop(0)
             t.status = 'Delivery'
-            # self.real_time.add_event_time_log(t, t.status, self.real_time.check_time(), ['Trumna', self.push_to.name])
-            # self.push_to.load(t)
-            # self.add_time(t)
+            self.add_event_time_log(t, t.status, self.real_time, ['Trumna', self.push_to.name])
+            self.push_to.load(t)
+            self.add_time(t, self.event_time)
 
         if self.push_to.max_in == False:
             while len(self.pull_from) > 0:
