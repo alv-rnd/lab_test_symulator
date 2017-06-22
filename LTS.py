@@ -5,20 +5,25 @@ import numpy as np
 import random
 import os
 
+cols = ['Delivery', 'Trumna', 'Check_in', 'Storage', 'Conditioning',
+                'TC', 'Deployment', 'TR', 'Analisys', 'AT',
+                'Final', 'Fin_queue', 'kind', 'project', 'temp', 'result']
+
+log = pd.DataFrame(columns=cols)
 
 class Manage:
     more = True
     '''
     Klasa zarządzająca wszytkim
     '''
-    def __init__(self, t_qty, tc_qty, tc_cap, tr_qty, at_qty, frq_check_in, all_day, event_param_lts, time_format):
-        self.t_qty = t_qty
-        self.tc_qty = tc_qty
-        self.tc_cap = tc_cap
-        self.tr_qty = tr_qty
-        self.at_qty = at_qty
-        self.frq_check_in = frq_check_in
-        self.all_day = all_day
+    def __init__(self, *args, time_format='min'):
+        self.t_qty = args[0]
+        self.tc_qty = args[1]
+        self.tc_cap = args[2]
+        self.tr_qty = args[3]
+        self.wich_qty = args[4]
+        self.at_qty = args[5]
+        self.frq_check_in = args[6]
         self.time_format = time_format
         self.test_list = []
         self.other_RSC =[]
@@ -27,8 +32,15 @@ class Manage:
         self.AT_list = []
         self.ready_list = []
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.at_qty)
-        self.event_time = event_param_lts
+        self.event_time = args[7]
         self.real_time = Time(self.test_list, self.time_format)
+
+        global log
+
+        log['Tests'] = [test.name for test in self.test_list]
+        log = log.set_index('Tests')
+        print(log)
+
 
 
     @staticmethod # chciałem zobaczyć czy się uda to zrobić w tym, może być na około
@@ -56,25 +68,25 @@ class Manage:
             print(check_time)
             # Uruchomienie Eventów: Transport i Check-in jeżeli czas jest równy 0 lub jeżeli czas jest
             # podzielny przez wartość która zwraca 'transport_qty'
-            if check_time == 0 or check_time % Manage.transport_qty(3, approach=self.all_day) == 0:
-                Transport(self.test_list, self.other_RSC[0], self.event_time[0]).run_event()
+            if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
+                Transport().run_event(self.test_list, self.other_RSC[0], self.event_time[0])
                 print('Transport')
                 self.spotX_on_RSC_loaded(10, self.other_RSC[0])
-                Check_in(self.other_RSC[0], self.other_RSC[1], self.event_time[1]).run_event()
+                Check_in().run_event(self.other_RSC[0], self.other_RSC[1], self.event_time[1])
                 print('Check_in')
                 self.spotX_on_RSC_loaded(10, self.other_RSC[1])
 
             # Uruchamianie Eventu Conditioning, musi być najpierw sprawdzenie czy frq_check_in jest równy 0,
             # inaczej wywala bład o dzieleniu przez 0 jeżeli od razu sprawdzimy modulo.
             if self.frq_check_in == 0:
-                Conditioning(self.other_RSC[1], self.TC_list, self.event_time[2]).run_event()
+                Conditioning().run_event(self.other_RSC[1], self.TC_list, self.event_time[2])
                 print('Conditioning')
                 for TC in self.TC_list:
                     self.spotX_on_RSC_loaded(10, TC)
 
                 #print('condi i frq_check == 0')
             elif check_time % self.real_time.time_converter(self.frq_check_in) == 0:
-                Conditioning(self.other_RSC[1], self.TC_list, self.event_time[2]).run_event()
+                Conditioning().run_event(self.other_RSC[1], self.TC_list, self.event_time[2])
                 print('Conditioning')
                 for TC in self.TC_list:
                     self.spotX_on_RSC_loaded(10, TC)
@@ -82,13 +94,13 @@ class Manage:
 
 
             # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
-            if self.real_time > 0:
-                Analysis(self.TR_list, self.AT_list, self.event_time[4]).run_event()
+            if self.real_time.check_time() > 0:
+                Analysis().run_event(self.TR_list, self.AT_list, self.event_time[4])
                 print('Alaliza')
                 for AT in self.AT_list:
                     self.spotX_on_RSC_loaded(1, AT)
                 # Uruchomienie eventu Deployment
-                Deployment(self.TC_list, self.TR_list, self.event_time[3]).run_event()
+                Deployment().run_event(self.TC_list, self.TR_list, self.event_time[3])
                 print('TR')
                 for TR in self.TR_list:
                     self.spotX_on_RSC_loaded(1, TR)
@@ -240,24 +252,24 @@ class Time:
         self.value = value
         self.time_init = 0
         self.real_time = 0
-        self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
+        # self.log = pd.DataFrame(columns=self.cols, index=self.test_list)
         #self.log = pd.DataFrame(columns=self.cols, index=[test.name for test in self.test_list)
 
-    def add_event_time_log(self, modulet, event, time, rsc, paramy=None, result=None):
-        """
-        Dodawanie informacji do logu przy zmianie statusu
-        :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
-        :param event: nazwa eventu, najlepiej chyba nazwa statusu bo bedzie pod ręką
-        :param time: czas zmiany statusu, real_time
-        :param rsc: lista z dwiema pozycjami, [nazwa rsc w której nastąpiła zmiana statusu, rsc do którego moduł jest wrzucany(np. komora TC2)]
-        :param paramy: lista z parametrami do wpisania, defaultowo None, dokładniej chodzi o [kind, projekt, temp], chyba dodawane przy check_in
-        :param result: ocena, dodawana przy evencie analisys
-        :return: nic
-        """
-        self.log.loc[modulet][event] = time
-        self.log.loc[modulet][rsc[0]] = rsc[1]
-        if paramy:
-            self.log.loc[modulet][12:15] = paramy
+    # def add_event_time_log(self, modulet, event, time, rsc, paramy=None, result=None):
+    #     """
+    #     Dodawanie informacji do logu przy zmianie statusu
+    #     :param modulet: test do zaktualizowania, chyba test jako object a nie test.name tylko nie wiem jak to się zachowa
+    #     :param event: nazwa eventu, najlepiej chyba nazwa statusu bo bedzie pod ręką
+    #     :param time: czas zmiany statusu, real_time
+    #     :param rsc: lista z dwiema pozycjami, [nazwa rsc w której nastąpiła zmiana statusu, rsc do którego moduł jest wrzucany(np. komora TC2)]
+    #     :param paramy: lista z parametrami do wpisania, defaultowo None, dokładniej chodzi o [kind, projekt, temp], chyba dodawane przy check_in
+    #     :param result: ocena, dodawana przy evencie analisys
+    #     :return: nic
+    #     """
+    #     self.log.loc[modulet][event] = time
+    #     self.log.loc[modulet][rsc[0]] = rsc[1]
+    #     if paramy:
+    #         self.log.loc[modulet][12:15] = paramy
 
     def add_time_module(self, modulet):
         self.modulet = modulet
@@ -276,46 +288,42 @@ class Time:
 
 
 class Event:
-    def __init__(self, pull_from, push_to, event_time):
+    pass
+    # def add_time(self, module):
+    #     # uzywana w run_event do zmiany czasu odwoluje sie do
+    #     # funkcji o tej samej nazwie w Modulet
+    #     module.add_time(self.event_time)
 
-        self.pull_from = pull_from
-        self.push_to = push_to
-        self.event_time = event_time
-        self.log = None
-
-    def add_time(self, module):
-        # uzywana w run_event do zmiany czasu odwoluje sie do
-        # funkcji o tej samej nazwie w Modulet
-        module.add_time(self.event_time)
-
-    def add_to_log(self, module):
-        log = {module.time: ['Event', module]}
-        module.add_to_log(log)
+    # def add_to_log(self, modulet, event, time, rsc, ):
+    #     self.real_time.add_event_time_log(modulet, event, time, rsc)
 
 
-    def run_event(self):
-        # dodaje do kontenera klasy RSC elementy z listy zrodlowej
-        # zaczynając od poczatku listy
-        # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
-        # dla poszczegolnych eventów. W przypadku uzycia argumentu
-        # module_qty narzucony jest limit przenoszonych testów
-
-        def run_update_tparams():
-            t = self.pull_from.loaded.pop(0)
-
-
-
-            self.add_to_log(t)
-            self.push_to.load(t)
-            self.add_time(t)
-
-        if self.push_to.max_in == False:
-            while len(self.pull_from.loaded) > 0:
-                run_update_tparams()
-        else:
-            while len(self.pull_from.loaded) > 0 and \
-                    self.push_to.max_in - len(self.push_to.loaded) > 0:
-                run_update_tparams()
+    # def run_event(self, pull_from, push_to, event_time):
+    #     # dodaje do kontenera klasy RSC elementy z listy zrodlowej
+    #     # zaczynając od poczatku listy
+    #     # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
+    #     # dla poszczegolnych eventów. W przypadku uzycia argumentu
+    #     # module_qty narzucony jest limit przenoszonych testów
+    #     self.pull_from = pull_from
+    #     self.push_to = push_to
+    #     self.event_time = event_time
+    #
+    #     def run_update_tparams():
+    #         t = self.pull_from.loaded.pop(0)
+    #
+    #
+    #
+    #         self.add_to_log(t)
+    #         self.push_to.load(t)
+    #         self.add_time(t)
+    #
+    #     if self.push_to.max_in == False:
+    #         while len(self.pull_from.loaded) > 0:
+    #             run_update_tparams()
+    #     else:
+    #         while len(self.pull_from.loaded) > 0 and \
+    #                 self.push_to.max_in - len(self.push_to.loaded) > 0:
+    #             run_update_tparams()
 
 
 class RSC:
@@ -351,22 +359,28 @@ class Transport(Event):
     podzielona na trumny o losowej pojemnosci z określonego zakresu (symulacja produkcji)
     wysyłanych ustaloną ilość razy na dobę
     '''
-    def __init__(self, *args):
-        super(Transport, self).__init__(*args)
+    # def __init__(self, *args):
+    #     super(Transport, self).__init__(*args)
 
-    def run_event(self):
+    print(log)
+
+    def run_event(self, pull_from, push_to, event_time):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
+        self.pull_from = pull_from
+        self.push_to = push_to
+        self.event_time = event_time
+
 
         def run_update_tparams():
             t = self.pull_from.pop(0)
             t.status = 'Delivery'
-            self.add_to_log(t, )
-            self.push_to.load(t)
-            self.add_time(t)
+            # self.real_time.add_event_time_log(t, t.status, self.real_time.check_time(), ['Trumna', self.push_to.name])
+            # self.push_to.load(t)
+            # self.add_time(t)
 
         if self.push_to.max_in == False:
             while len(self.pull_from) > 0:
@@ -400,8 +414,8 @@ class Check_in(Event):
     zmiana statusu na 'x'
     '''
     project_qty = 3
-    def __init__(self, *args):
-        super(Check_in, self).__init__(*args)
+    # def __init__(self, *args):
+    #     super(Check_in, self).__init__(*args)
 
     def set_project_qty(self, qty):
         self.project_qty = qty
@@ -419,20 +433,24 @@ class Check_in(Event):
         #     # TODO: OBSŁUŻYĆ KUPSZTALA
         # else: test.temp = random.choice([-35, 23, 85])
 
-    def run_event(self, module_qty=False):
+    def run_event(self, pull_from, push_to, event_time, module_qty=False):
         # dodaje do kontenera klasy RSC elementy z listy zrodlowej
         # zaczynając od poczatku listy
         # predefiniowanych(rodzaj RSC, lista zrodlowa) osobno
         # dla poszczegolnych eventów. W przypadku uzycia argumentu
         # module_qty narzucony jest limit przenoszonych testów
 
+        self.pull_from = pull_from
+        self.push_to = push_to
+        self.event_time = event_time
+
         def run_update_tparams():
             t = self.pull_from.loaded.pop(0)
             self.gen_rand_testparam(t) # nadajemy losowe parametry
             t.status = 'Checked in' # updateujemy status
-            self.add_to_log(t)    # updatujemy logi
-            self.push_to.load(t)  # przenosimy miedzy zasobami
-            self.add_time(t)      # updateujemy self.time modulu
+            # self.real_time.add_event_time_log(t, t.status, self.real_time.check_time(), ['Storage', self.push_to.name])   # updatujemy logi
+            # self.push_to.load(t)  # przenosimy miedzy zasobami
+            # self.add_time(t)      # updateujemy self.time modulu
 
         if self.push_to.max_in == False:
             while len(self.pull_from.loaded) > 0:
@@ -473,10 +491,14 @@ class Conditioning(Event):
     klasa symulująca kondycjonownie modułu w okreslonyh z góry częstościach uzupełniania komór,
     ich pojemnościach i temperaturach.
     '''
+
     rdylst = []
 
+    def run_event(self, pull_from, push_to, event_time):
 
-    def run_event(self):
+        self.pull_from = pull_from
+        self.push_to = push_to
+        self.event_time = event_time
 
         # TODO: czy sprawdzenie 'len(chamber.loaded) < chamber.max_in' jest poprawne??
         # TODO: w tym momencie sprawdzamy załadowanie konkretnej komory (komora ma większe cap niż np. te 8) i może się zdażyć że w jednej będzie 14 modułów a w drugiej 2 moduły (suma 16 czyli ok na dwa TR), a na ten moment mamy że musi być 8 + 8.
@@ -485,20 +507,21 @@ class Conditioning(Event):
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
             # oraz spr czy jest po co wrzucac
             # (suma po tc.loaded vs len trlist
-            for test in self.pull_from.loaded:
-                for chamber in self.push_to:
+            for chamber in self.push_to:
+                for test in self.pull_from.loaded:
                     if test.temp == chamber.temp:
                         #może coś takiego??
                         # TODO: if len(self.puch_to) < len(tr_list)*(frq_check_in/deploy_time)
-                        if len(chamber.loaded) < chamber.max_in or chamber.max_in == False:
+                        if len(self.push_to) < chamber.max_in or chamber.max_in == False:
                             if test not in l:
                                 chamber.load(test)
                                 self.add_to_rdylst(test)
                                 l.append(test)
                                 test.status = 'Conditioning'
-                                self.add_to_log(test)
-                                if test.temp != 23:
-                                    self.add_time(test)
+                                # self.real_time.add_event_time_log(test, test.status, self.real_time.check_time(),
+                                #                                   ['TC', self.push_to.name])
+                                # if test.temp != 23:
+                                #     self.add_time(test)
 
 
 
@@ -535,7 +558,12 @@ class Deployment(Event):
     # def __init__(self, *args, **kws):
     #     super(Deployment, self).__init__(*args, **kws)
 
-    def run_event(self):
+
+    def run_event(self, pull_from, push_to, event_time):
+
+        self.pull_from = pull_from
+        self.push_to = push_to
+        self.event_time = event_time
 
         l = []
         for test in Conditioning.rdylst:
@@ -544,8 +572,9 @@ class Deployment(Event):
                     tr.load(test)
                     l.append(test)
                     test.status = 'DEPLOYMENT'
-                    self.add_time(test)
-                    self.add_to_log(test)
+                    # self.add_time(test)
+                    # self.real_time.add_event_time_log(test, test.status, self.real_time.check_time(),
+                    #                                   ['PT', self.push_to.name])
 
         for item in l:
             for j in range(len(self.pull_from)):
@@ -578,10 +607,14 @@ class Analysis(Event):
     zmiana statusu na finalny, dodanie oceny testu.
     '''
 
-    def run_event(self): # jak pobrać czas? to działa ale pycharm podkreśla
+    def run_event(self, pull_from, push_to, event_time): # jak pobrać czas? to działa ale pycharm podkreśla
 
         # do przeróbyyyyyy
         l, k = [], []
+
+        self.pull_from = pull_from
+        self.push_to = push_to
+        self.event_time = event_time
 
         for tr in self.pull_from:  # z listy test roomow
             for test in tr.loaded:  # z kazdego tr pobierz test
@@ -599,8 +632,9 @@ class Analysis(Event):
                     l.append(test)
                     test.status = 'ANALYSIS'
                     test.result_eval = np.random.choice(['OK', 'COK', 'NOK'], 1, p=[0.7, 0.2, 0.1])
-                    self.add_time(test)
-                    self.add_to_log(test)
+                    # self.add_time(test)
+                    # self.real_time.add_event_time_log(test, test.status, self.real_time.check_time(),
+                    #                                   ['AT', self.push_to.name])
             for item in l:
                 for j in range(len(at.in_queue)):
                     if item in at.in_queue:

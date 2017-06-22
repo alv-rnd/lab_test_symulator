@@ -188,9 +188,9 @@ class LtsBoxLayout(BoxLayout):
                          self.event_param_lts,
                          self.time_format)
         sim.sim_run()
-
-        log = sim.real_time.log
-        print(log)
+        #
+        # log = sim.real_time.log
+        # print(log)
 
 
 
