@@ -10,6 +10,8 @@ cols = ['Time_0', 'Delivery', 'Time_1', 'Check_in', 'Time_2',
                 'Time_5', 'Final', 'kind', 'project', 'temp', 'result']
 
 log = pd.DataFrame(columns=cols)
+tests_to_deploy = 0
+
 
 class Manage:
     more = True
@@ -36,6 +38,8 @@ class Manage:
         self.gen_ALL_RSCs(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.at_qty)
         self.event_time = event_time
         self.real_time = Time(self.test_list, self.time_format)
+
+        print(self.t_qty, self.tc_qty, self.tc_cap, self.tr_qty, self.wich_qty, self.trunks_qty, self.at_qty, self.frq_check_in)
 
         global log
 
@@ -76,27 +80,52 @@ class Manage:
             # podzielny przez wartość która zwraca 'transport_qty'
             if check_time == 0 or check_time % Manage.transport_qty(3) == 0:
                 print('Transport', check_time)
-                Transport().run_event(self.test_list, self.other_RSC[0], self.event_time[0], self.real_time.check_time())
+                Transport().run_event(self.test_list,
+                                      self.other_RSC[0],
+                                      self.event_time[0],
+                                      self.real_time.check_time())
+
             if  check_time != 0 and (check_time == self.event_time[0] or check_time % (Manage.transport_qty(3)+ self.event_time[0]) == 0):
                 print('Check_in', check_time)
-                Check_in().run_event(self.other_RSC[0], self.other_RSC[1], self.event_time[1], self.real_time.check_time())
+                Check_in().run_event(self.other_RSC[0],
+                                     self.other_RSC[1],
+                                     self.event_time[1],
+                                     self.real_time.check_time())
 
             # Uruchamianie Eventu Conditioning, musi być najpierw sprawdzenie czy frq_check_in jest równy 0,
             # inaczej wywala bład o dzieleniu przez 0 jeżeli od razu sprawdzimy modulo.
             if self.frq_check_in == 0:
-                Conditioning().run_event(self.other_RSC[1], self.TC_list, self.event_time[2], self.real_time.check_time())
+                Conditioning().run_event(self.other_RSC[1],
+                                         self.TC_list,
+                                         self.event_time[2],
+                                         self.real_time.check_time(),
+                                         self.tr_qty,
+                                         self.frq_check_in,
+                                         self.event_time[3])
 
                 #print('condi i frq_check == 0')
             elif check_time % self.real_time.time_converter(self.frq_check_in) == 0:
-                Conditioning().run_event(self.other_RSC[1], self.TC_list, self.event_time[2], self.real_time.check_time())
+                Conditioning().run_event(self.other_RSC[1],
+                                         self.TC_list,
+                                         self.event_time[2],
+                                         self.real_time.check_time(),
+                                         self.tr_qty,
+                                         self.frq_check_in,
+                                         self.event_time[3])
 
 
             # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
             if self.real_time.check_time() > 0:
-                Analysis().run_event(self.TR_list, self.AT_list, self.event_time[4], self.real_time.check_time())
+                Analysis().run_event(self.TR_list,
+                                     self.AT_list,
+                                     self.event_time[4],
+                                     self.real_time.check_time())
 
                 # Uruchomienie eventu Deployment
-                Deployment().run_event(self.TC_list, self.TR_list, self.event_time[3], self.real_time.check_time())
+                Deployment().run_event(self.TC_list,
+                                       self.TR_list,
+                                       self.event_time[3],
+                                       self.real_time.check_time())
 
             # Sprawdzenie czy ilość testów podana na początku jest równa ilości testów w kolejce Fin
             if test_qty == len(RSC_Analysis.finit) and test_qty != 0:
@@ -435,6 +464,8 @@ class Check_in(Event):
                     # print('max in = True & mod_qty = False')
                 run_update_tparams()
 
+        for test in self.push_to.loaded:
+            print(test.temp)
 
 class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
@@ -463,7 +494,7 @@ class Conditioning(Event):
 
     rdylst = []
 
-    def run_event(self, pull_from, push_to, event_time, real_time):
+    def run_event(self, pull_from, push_to, event_time, real_time, tr_qty, frq_check_in, deploy_time):
 
         self.pull_from = pull_from
         self.push_to = push_to
@@ -473,27 +504,40 @@ class Conditioning(Event):
         # TODO: czy sprawdzenie 'len(chamber.loaded) < chamber.max_in' jest poprawne??
         # TODO: w tym momencie sprawdzamy załadowanie konkretnej komory (komora ma większe cap niż np. te 8) i może się zdażyć że w jednej będzie 14 modułów a w drugiej 2 moduły (suma 16 czyli ok na dwa TR), a na ten moment mamy że musi być 8 + 8.
         # TODO: może zamiast tego, sprawdzać czy suma wrzuconych modułów jest mniejsza niż maks na TRy i potem czy maks cap (Ale to realne cap TC) TC jest większe od loaded
+        global tests_to_deploy
+
+        for chamber in self.push_to:
+            tests_to_deploy += len(chamber.loaded)
+        print('Ilość na początku condi', tests_to_deploy)
+
         l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
             # oraz spr czy jest po co wrzucac
             # (suma po tc.loaded vs len trlist
             for chamber in self.push_to:
                 for test in self.pull_from.loaded:
-                    if test.temp == chamber.temp:
+                    if test.temp == chamber.temp and test not in l:
                         #może coś takiego??
                         # TODO: if len(self.puch_to) < len(tr_list)*(frq_check_in/deploy_time)
-                        if len(self.push_to) < chamber.max_in or chamber.max_in == False:
-                            if test not in l:
-                                chamber.load(test)
-                                self.add_to_rdylst(test)
-                                l.append(test)
-                                test.status = 'Conditioning'
-                                self.add_event_time_log(test, 'Time_3', self.event_time,
-                                                        [test.status, chamber.name], self.real_time)
-                                if test.temp != 23:
-                                    self.add_time(test, self.event_time)
+                        if tests_to_deploy < (tr_qty*(frq_check_in/deploy_time)):
+                            if len(self.push_to) < chamber.max_in or chamber.max_in == False:
+                                if test not in l:
+                                    chamber.load(test)
+                                    self.add_to_rdylst(test)
+                                    l.append(test)
+                                    tests_to_deploy += 1
+                                    print('Ilość po jednym', tests_to_deploy)
+                                    test.status = 'Conditioning'
+                                    if test.temp == 23: # jeżeli test RT to czas eventu conditioning == 0 więc zostanie przepisany real_time
+                                        self.add_event_time_log(test, 'Time_3', 0,
+                                                            [test.status, chamber.name], self.real_time)
+                                    else:
+                                        self.add_event_time_log(test, 'Time_3', self.event_time,
+                                                            [test.status, chamber.name], self.real_time)
+                                    if test.temp != 23:
+                                        self.add_time(test, self.event_time)
 
-
+        print('Ilość po condi', tests_to_deploy)
 
         for item in l:
             if item in self.pull_from.loaded:

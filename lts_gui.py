@@ -150,7 +150,7 @@ class LtsBoxLayout(BoxLayout):
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)
         self.questionpopup = QuestionPopup()
-        self.main_param = ['test_qty', 'tc_qty', 'tc_cap', 'tr_qty', 'wich_qty', 'trunks_qty', 'at_qty', 'frq_check_in']
+        self.main_param = ['test_qty', 'tc_qty', 'tc_cap', 'tr_qty', 'wich_qty', 'trunks_qty', 'at_qty', 'frq_check_in', 'sim_time']
         self.event_param = ['transport_time', 'check_in_time', 'condi_time', 'deploy_time', 'anal_time']
         self.main_param_lts = []
         self.event_param_lts = []

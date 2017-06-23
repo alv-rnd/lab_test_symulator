@@ -207,17 +207,17 @@
 
                     CustomLabel:
                     # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
-                        id: label_frq_check_in
+                        id: label_sim_time
                         text: "Czas symulacji:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: frq_check_in
+                            id: sim_time
                             height: label_frq_check_in.size[1]
                             hint_text: "time"
                             text: "0"
                         QuestionButton:
-                            id: frq_text
+                            id: sim_time_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
                             height: label_frq_check_in.size[1]
                             on_release: root.questionpopup.open("frq_text")
