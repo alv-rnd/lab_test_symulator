@@ -31,38 +31,38 @@ import matplotlib.pyplot as plt
 
 # class Graph_1_Screen(Screen):
 #     pass
-
-
+#
+#
 class Graph_1(Screen):
-
-    def __init__(self, *args, **kwargs):
-        super(Graph_1, self).__init__(**kwargs)
-
-        def press(event):
-            print('press released from test', event.x, event.y, event.button)
-
-        def release(event):
-            print('release released from test', event.x, event.y, event.button)
-
-        def resize(event):
-            print('resize from mpl ', event)
-
-    fig = plt.figure()
-    figure = fig
-    ax1 = plt.subplot2grid((1, 1), (0, 0))
-
-    df = pd.read_csv('world_bank.csv')
-    # print(df.columns[4:])
-    ax1.plot_date(df.columns[4:], df.iloc[0][4:], '-', label="Kasz")
-    for label in ax1.xaxis.get_ticklabels():
-        label.set_rotation(45)
-    ax1.grid(True)
-
-    plt.xlabel('Year')
-    plt.ylabel('Kasz')
-    plt.title('Wykres kaszu dla Polski na przestrzeni lat')
-    plt.legend()
-    plt.subplots_adjust(left=0.09, bottom=0.20, right=0.94, top=0.90, wspace=0.2, hspace=0)
+    pass
+#     def __init__(self, *args, **kwargs):
+#         super(Graph_1, self).__init__(**kwargs)
+#
+#         def press(event):
+#             print('press released from test', event.x, event.y, event.button)
+#
+#         def release(event):
+#             print('release released from test', event.x, event.y, event.button)
+#
+#         def resize(event):
+#             print('resize from mpl ', event)
+#
+#     fig = plt.figure()
+#     figure = fig
+#     ax1 = plt.subplot2grid((1, 1), (0, 0))
+#
+#     # df = pd.read_csv('world_bank.csv')
+#     # print(df.columns[4:])
+#     ax1.plot_date(df.columns[4:], df.iloc[0][4:], '-', label="Kasz")
+#     for label in ax1.xaxis.get_ticklabels():
+#         label.set_rotation(45)
+#     ax1.grid(True)
+#
+#     plt.xlabel('Year')
+#     plt.ylabel('Kasz')
+#     plt.title('Wykres kaszu dla Polski na przestrzeni lat')
+#     plt.legend()
+#     plt.subplots_adjust(left=0.09, bottom=0.20, right=0.94, top=0.90, wspace=0.2, hspace=0)
 
     # plt.show()
 
