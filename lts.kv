@@ -133,35 +133,19 @@
                             on_release: root.questionpopup.open("tr_text")
 
                     CustomLabel:
-                        id: label_wich_qty
-                        text: "Ilosc WICH:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: wich_qty
-                            height: label_wich_qty.size[1]
-                            hint_text: "qty"
-                            text: "2"
-                        QuestionButton:
-                            id: wich_text
-                            pos: label_wich_qty.x, label_wich_qty.texture_size[1] / 2
-                            height: label_wich_qty.size[1]
-                            on_release: root.questionpopup.open("wich_text")
-
-                    CustomLabel:
-                        id: label_trunk_time
+                        id: label_trunk_cap
                         text: "Trumny:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: trunk_time
-                            height: label_trunk_time.size[1]
+                            id: trunk_cap
+                            height: label_trunk_cap.size[1]
                             hint_text: "qty/day"
                             text: "3"
                         QuestionButton:
                             id: trunk_text
-                            pos: label_trunk_time.x, label_trunk_time.texture_size[1] / 2
-                            height: label_trunks_qty.size[1]
+                            pos: label_trunk_cap.x, label_trunk_cap.texture_size[1] / 2
+                            height: label_trunk_cap.size[1]
                             on_release: root.questionpopup.open("trunk_text")
 
                     CustomLabel:
@@ -181,39 +165,21 @@
                             on_release: root.questionpopup.open("at_qty_text")
 
                     CustomLabel:
-                        id: label_frq_check_in
+                        id: label_tc_refill_time
                         text: "Wrzuty:"
                     BoxLayout:
                         orientation: 'horizontal'
                         BoxLayout:
-                            id: frq_check_in_box
+                            id: tc_refill_time_box
                             CustomTextInput:
-                                id: frq_check_in
-                                height: label_frq_check_in.size[1]
+                                id: tc_refill_time
+                                height: label_tc_refill_time.size[1]
                                 hint_text: "qty/h"
                                 text: "120"
                         QuestionButton:
-                            id: frq_text
-                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
-                            height: label_frq_check_in.size[1]
-                            on_release: root.questionpopup.open("frq_text")
-
-
-                    CustomLabel:
-                    # na razie to, ale mysle zeby zmienic w tym miejscu na spinner i dac wybor qty albo time
-                        id: label_sim_time
-                        text: "Czas symulacji:"
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        CustomTextInput:
-                            id: sim_time
-                            height: label_frq_check_in.size[1]
-                            hint_text: "time"
-                            text: "0"
-                        QuestionButton:
-                            id: sim_time_text
-                            pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
-                            height: label_frq_check_in.size[1]
+                            id: tc_refill_time_text
+                            pos: label_tc_refill_time.x, label_tc_refill_time.texture_size[1] / 2
+                            height: label_tc_refill_time.size[1]
                             on_release: root.questionpopup.open("frq_text")
 
                 Label:
@@ -228,19 +194,19 @@
                     row_force_default: True
                     row_default_height: 40
                     CustomLabel:
-                        id: label_transport_time
+                        id: label_delivery_time
                         text: "Czas transportu:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: transport_time
-                            height: label_transport_time.size[1]
+                            id: delivery_time
+                            height: label_delivery_time.size[1]
                             hint_text: "time"
                             text: "120"
                         QuestionButton:
-                            id: frq_text
-                            pos: label_transport_time.x, label_transport_time.texture_size[1] / 2
-                            height: label_transport_time.size[1]
+                            id: transport_text
+                            pos: label_delivery_time.x, label_delivery_time.texture_size[1] / 2
+                            height: label_delivery_time.size[1]
 
                     CustomLabel:
                         id: label_check_in_time
@@ -253,54 +219,54 @@
                             hint_text: "time"
                             text: "30"
                         QuestionButton:
-                            id: frq_text
+                            id: check_in_text
                             pos: label_check_in_time.x, label_check_in_time.texture_size[1] / 2
                             height: label_check_in_time.size[1]
 
                     CustomLabel:
-                        id: label_condi_time
+                        id: label_conditioning_time
                         text: "Czas Condi:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: condi_time
-                            height: label_condi_time.size[1]
+                            id: conditioning_time
+                            height: label_conditioning_time.size[1]
                             hint_text: "time"
                             text: "240"
                         QuestionButton:
-                            id: frq_text
-                            pos: label_condi_time.x, label_condi_time.texture_size[1] / 2
-                            height: label_condi_time.size[1]
+                            id: conditioning_time_text
+                            pos: label_conditioning_time.x, label_conditioning_time.texture_size[1] / 2
+                            height: label_conditioning_time.size[1]
 
                     CustomLabel:
-                        id: label_deploy_time
+                        id: label_deployment_time
                         text: "Bum time:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: deploy_time
-                            height: label_deploy_time.size[1]
+                            id: deployment_time
+                            height: label_deployment_time.size[1]
                             hint_text: "time"
                             text: "15"
                         QuestionButton:
-                            id: frq_text
-                            pos: label_deploy_time.x, label_deploy_time.texture_size[1] / 2
-                            height: label_deploy_time.size[1]
+                            id: deployment_time_text
+                            pos: label_deployment_time.x, label_deployment_time.texture_size[1] / 2
+                            height: label_deployment_time.size[1]
 
                     CustomLabel:
-                        id: label_anal_time
+                        id: label_analysis_time
                         text: "Anal time:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: anal_time
-                            height: label_anal_time.size[1]
+                            id: analysis_time
+                            height: label_analysis_time.size[1]
                             hint_text: "time"
                             text: "15"
                         QuestionButton:
-                            id: frq_text
-                            pos: label_anal_time.x, label_anal_time.texture_size[1] / 2
-                            height: label_anal_time.size[1]
+                            id: analysis_time_text
+                            pos: label_analysis_time.x, label_analysis_time.texture_size[1] / 2
+                            height: label_analysis_time.size[1]
             BoxLayout:
                 size_hint_y: .06
                 orientation: 'horizontal'

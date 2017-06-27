@@ -267,8 +267,7 @@ class LtsBoxLayout(BoxLayout):
                  'project_qty',
                  'tc_cap',
                  'tr_qty',
-                 'wich_qty',
-                 'trunk_time',
+                 'trunk_cap',
                  'delivery_time',
                  'check_in_time',
                  'conditioning_time',
@@ -276,6 +275,7 @@ class LtsBoxLayout(BoxLayout):
                  'deployment_time',
                  'analysis_time',
                  'at_qty']
+
         self.main_param_lts = []
         self.event_param_lts = []
         self.time_format = "min"
@@ -310,9 +310,9 @@ class LtsBoxLayout(BoxLayout):
         for i in self.main_param:
             param = eval("self.main.ids.{}.text".format(i))
             self.main_param_lts.append(int(param))
-        for i in self.event_param:
-            param = eval("self.main.ids.{}.text".format(i))
-            self.event_param_lts.append(int(param))
+        # for i in self.event_param:
+        #     param = eval("self.main.ids.{}.text".format(i))
+        #     self.event_param_lts.append(int(param))
 
         sim = LTSU.Manage(self.main_param_lts[0],
                           self.main_param_lts[1],
@@ -326,7 +326,7 @@ class LtsBoxLayout(BoxLayout):
                           self.main_param_lts[9],
                           self.main_param_lts[10],
                           self.main_param_lts[11])
-        sim.sim_run()
+        # sim.sim_run()
 
 
 
@@ -337,7 +337,7 @@ class LtsBoxLayout(BoxLayout):
         #     self.graphs.pop(self.graphs[0])
         #     self.graphs.append(g)
 
-        self.graph_1_py.add_plot(self.prepare_log(g))
+        self.graph_1_py.add_plot(self.prepare_log(sim.sim_run()))
 
     def slider_magic(self, instance, value):
         print(int(value))
