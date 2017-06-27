@@ -113,7 +113,6 @@ class Manage:
                                          self.frq_check_in,
                                          self.event_time[3])
 
-
             # Uruchomienie eventu Analiza, który "robi miejsca" w test roomach
             if self.real_time.check_time() > 0:
                 Analysis().run_event(self.TR_list,
@@ -131,6 +130,9 @@ class Manage:
             if test_qty == len(RSC_Analysis.finit) and test_qty != 0:
                 self.more = False
 
+            if check_time % 720 == 0:
+                print('Next day')
+
             # albo jezeli czas jest równy czasowi podanemu przez użytkownika (wtedy test_qty == 0)
             # na razie to dla mnie żeby nie czekać całej kolejki testów
             elif check_time == 240:
@@ -140,7 +142,9 @@ class Manage:
             # wychodząc z tej zasady że jedna klasa nie wpływa na paramy innej klasy bezpośrednio
             self.real_time.add_real_time(1)
 
-        print(log)
+        return log
+
+
 
 
         # tmin = 0 #jakiś przykładowy czas w min
@@ -464,8 +468,8 @@ class Check_in(Event):
                     # print('max in = True & mod_qty = False')
                 run_update_tparams()
 
-        for test in self.push_to.loaded:
-            print(test.temp)
+        # for test in self.push_to.loaded:
+        #     print(test.temp)
 
 class RSC_Store(RSC):
     '''Tam gdzie skladowane sa testy a w oddali majacza swiatła mordoru'''
@@ -508,7 +512,7 @@ class Conditioning(Event):
 
         for chamber in self.push_to:
             tests_to_deploy += len(chamber.loaded)
-        print('Ilość na początku condi', tests_to_deploy)
+        # print('Ilość na początku condi', tests_to_deploy)
 
         l = []
         if len(self.pull_from.loaded) > 0: # spr czy jest co brac
@@ -526,7 +530,7 @@ class Conditioning(Event):
                                     self.add_to_rdylst(test)
                                     l.append(test)
                                     tests_to_deploy += 1
-                                    print('Ilość po jednym', tests_to_deploy)
+                                    # print('Ilość po jednym', tests_to_deploy)
                                     test.status = 'Conditioning'
                                     if test.temp == 23: # jeżeli test RT to czas eventu conditioning == 0 więc zostanie przepisany real_time
                                         self.add_event_time_log(test, 'Time_3', 0,
@@ -537,8 +541,8 @@ class Conditioning(Event):
                                     if test.temp != 23:
                                         self.add_time(test, self.event_time)
 
-        print('Ilość po condi', tests_to_deploy)
-
+        # print('Ilość po condi', tests_to_deploy)
+        #
         for item in l:
             if item in self.pull_from.loaded:
                 self.pull_from.loaded.remove(item)

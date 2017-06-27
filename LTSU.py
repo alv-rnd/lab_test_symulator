@@ -5,21 +5,44 @@ import os
 
 class Manage:
 
-    def __init__(self):
+    def __init__(self,
+                 test_qty,
+                 project_qty,
+                 tc_cap,
+                 tr_qty,
+                 wich_qty,
+                 trunk_time,
+                 delivery_time,
+                 check_in_time,
+                 conditioning_time,
+                 tc_refill_time,
+                 deployment_time,
+                 analysis_time,
+                 at_qty):
+
 
         # czasy eventów
         self.real_time = 0
-        self.time_of_delivery = 60
-        self.time_of_check_in = 20
-        self.time_of_conditioning = 240
-        self.TC_refill_time = 120
-        self.time_of_deployment = 20
-        self.time_of_analysis = 20
+        self.time_of_delivery = delivery_time
+        self.time_of_check_in = check_in_time
+        self.time_of_conditioning = conditioning_time
+        self.TC_refill_time = tc_refill_time
+        self.time_of_deployment = deployment_time
+        self.time_of_analysis = analysis_time
+
 
         # listy testów i zasobów
         self.test_list = []
         self.rsc_list = []
         self.finished = []
+        self.project_qty = project_qty
+        self.test_qty = test_qty
+        self.tr_qty = tr_qty
+        self.wich_qty = wich_qty
+        self.at_qty = at_qty
+        self.trunk_time = trunk_time
+        self.tc_cap = tc_cap
+
 
         # testy
         self.project_list = list(range(1, 5+1))
@@ -354,8 +377,5 @@ class Module:
     def time_update(self, event_time):
         self.ready_time += event_time
 
-
-sim = Manage()
-sim.sim_run()
 
 

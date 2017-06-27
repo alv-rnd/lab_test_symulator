@@ -2,11 +2,12 @@
 
 import kivy
 
-import LTS
+import LTSU
 
 import numpy as np
 import math
 import pandas as pd
+import os
 
 from kivy.app import App
 from kivy.uix.popup import Popup
@@ -17,6 +18,7 @@ from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
+from kivy.uix.slider import Slider
 from kivy.properties import ObjectProperty, NumericProperty
 # from kivy.utils import get_color_from_hex
 
@@ -24,47 +26,152 @@ from kivy.garden.graph import Graph, MeshLinePlot
 
 import matplotlib
 matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
-from kivy.garden.matplotlib import FigureCanvasKivyAgg
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas, NavigationToolbar
 import matplotlib.pyplot as plt
+import matplotlib.figure as Figure
+from matplotlib.animation import FuncAnimation
 
 
 
-# class Graph_1_Screen(Screen):
-#     pass
-#
-#
+def enter_axes(event):
+    print('enter_axes', event.inaxes)
+    event.inaxes.patch.set_facecolor('yellow')
+    event.canvas.draw()
+
+def leave_axes(event):
+    print('leave_axes', event.inaxes)
+    event.inaxes.patch.set_facecolor('white')
+    event.canvas.draw()
+
+def enter_figure(event):
+    print('enter_figure', event.canvas.figure)
+    event.canvas.figure.patch.set_facecolor('red')
+    event.canvas.draw()
+
+def leave_figure(event):
+    print('leave_figure', event.canvas.figure)
+    event.canvas.figure.patch.set_facecolor('grey')
+    event.canvas.draw()
+
+def press(event):
+    print('press released from test', event.x, event.y, event.button)
+
+
+def release(event):
+    print('release released from test', event.x, event.y, event.button)
+
+
+def keypress(event):
+    print('key down', event.key)
+
+
+def keyup(event):
+    print('key up', event.key)
+
+
+def motionnotify(event):
+    print('mouse move to ', event.x, event.y)
+
+
+def resize(event):
+    print('resize from mpl ', event.width, event.height)
+
+
+def scroll(event):
+    print('scroll event from mpl ', event.x, event.y, event.step)
+
+
+def figure_enter(event):
+    print('figure enter mpl')
+
+
+def figure_leave(event):
+    print('figure leaving mpl')
+
+
+def close(event):
+    print('closing figure')
+
+
 class Graph_1(Screen):
-    pass
-#     def __init__(self, *args, **kwargs):
-#         super(Graph_1, self).__init__(**kwargs)
-#
-#         def press(event):
-#             print('press released from test', event.x, event.y, event.button)
-#
-#         def release(event):
-#             print('release released from test', event.x, event.y, event.button)
-#
-#         def resize(event):
-#             print('resize from mpl ', event)
-#
-#     fig = plt.figure()
-#     figure = fig
-#     ax1 = plt.subplot2grid((1, 1), (0, 0))
-#
-#     # df = pd.read_csv('world_bank.csv')
-#     # print(df.columns[4:])
-#     ax1.plot_date(df.columns[4:], df.iloc[0][4:], '-', label="Kasz")
-#     for label in ax1.xaxis.get_ticklabels():
-#         label.set_rotation(45)
-#     ax1.grid(True)
-#
-#     plt.xlabel('Year')
-#     plt.ylabel('Kasz')
-#     plt.title('Wykres kaszu dla Polski na przestrzeni lat')
-#     plt.legend()
-#     plt.subplots_adjust(left=0.09, bottom=0.20, right=0.94, top=0.90, wspace=0.2, hspace=0)
 
-    # plt.show()
+
+
+    def __init__(self, *args, **kwargs):
+        super(Graph_1, self).__init__(**kwargs)
+
+
+    def get_nav(self, wid):
+        nav = NavigationToolbar(wid)
+        return nav.actionbar
+
+    def get_fc(self, log):
+
+        width = 0.5
+
+        # x = [1, 2, 3, 4, 5, 6]
+        # y = [5, 2, 4, 7, 9, 4]
+        # y2 = [0, 0, 3, 2, 3, 0]
+        #
+        # statusy = ['Delivery', 'Check in', 'Conditioning', 'Deployment', 'Analisys', 'Finish']
+
+        x = [1, 2, 3]
+        statusy = ['Delivery', 'Check in', 'Conditioning']
+        y = [log[0], log[0], log[0]]
+
+        fig = plt.figure(facecolor='none')
+        ax = fig.add_subplot(111, animated=True)
+        ax.set_facecolor('none')
+        ax.spines['bottom'].set_color('white')
+        ax.spines['top'].set_color('none')
+        ax.spines['left'].set_color('white')
+        ax.spines['right'].set_color('none')
+
+        xa = ax.xaxis
+        ya = ax.yaxis
+
+        xa.set_tick_params(labelcolor='white')
+        xa.set_tick_params(color='white')
+        ya.set_tick_params(labelcolor='white')
+        ya.set_tick_params(color='white')
+
+        b1 = plt.bar(x, y, width=width)
+        # b2 = plt.bar(x, y2, color='red', bottom=y, width=width)
+
+        plt.xticks(x, statusy)
+        plt.xlabel('Statusy testów', color='white', fontsize=16)
+        plt.ylabel('Ilość testów', color='white', fontsize=16)
+        plt.title('Symulacja {}'.format(1), color='white', fontsize=20)
+        plt.legend()
+
+        # ani = FuncAnimation(fig, update, frames=120, bl)
+
+        wid = FigureCanvas(fig)
+
+        # fig.canvas.mpl_connect('figure_enter_event', enter_figure)
+        # fig.canvas.mpl_connect('figure_leave_event', leave_figure)
+        # fig.canvas.mpl_connect('axes_enter_event', enter_axes)
+        # fig.canvas.mpl_connect('axes_leave_event', leave_axes)
+        fig.canvas.mpl_connect('button_press_event', press)
+        fig.canvas.mpl_connect('button_release_event', release)
+        fig.canvas.mpl_connect('key_press_event', keypress)
+        fig.canvas.mpl_connect('key_release_event', keyup)
+        fig.canvas.mpl_connect('motion_notify_event', motionnotify)
+        fig.canvas.mpl_connect('resize_event', resize)
+        fig.canvas.mpl_connect('scroll_event', scroll)
+        fig.canvas.mpl_connect('figure_enter_event', figure_enter)
+        fig.canvas.mpl_connect('figure_leave_event', figure_leave)
+        fig.canvas.mpl_connect('close_event', close)
+
+
+
+        return wid
+
+    def add_plot(self, log):
+
+        # wid = self.get_fc()
+        self.add_widget(self.get_fc(log))
+        # self.add_widget(self.get_nav(wid))
 
 
 class Graph_2_Screen(Screen):
@@ -134,7 +241,12 @@ class QuestionPopup(Popup):
         popup = super(QuestionPopup, self)
         popup.open()
 
-        # TODO: określić wyjście z popup'a poprzez klawisz Enter
+
+# class TimeSlider(Slider):
+#     time_slider_py = ObjectProperty()
+#
+#     self.
+
 
 
 class LtsBoxLayout(BoxLayout):
@@ -143,24 +255,49 @@ class LtsBoxLayout(BoxLayout):
     """
 
     main = ObjectProperty()
-    graphs_screens_py = ObjectProperty()
-    screen_text_py = ObjectProperty()
-
+    graph_1_py = ObjectProperty()
+    time_slider_1_py = ObjectProperty()
+    # screen_text_py = ObjectProperty()
+    graphs = []
 
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)
         self.questionpopup = QuestionPopup()
-        self.main_param = ['test_qty', 'tc_qty', 'tc_cap', 'tr_qty', 'wich_qty', 'trunks_qty', 'at_qty', 'frq_check_in', 'sim_time']
-        self.event_param = ['transport_time', 'check_in_time', 'condi_time', 'deploy_time', 'anal_time']
+        self.main_param = ['test_qty',
+                 'project_qty',
+                 'tc_cap',
+                 'tr_qty',
+                 'wich_qty',
+                 'trunk_time',
+                 'delivery_time',
+                 'check_in_time',
+                 'conditioning_time',
+                 'tc_refill_time',
+                 'deployment_time',
+                 'analysis_time',
+                 'at_qty']
         self.main_param_lts = []
         self.event_param_lts = []
         self.time_format = "min"
         self.screens = {
-            "Wykres 1": "graph_1",
-            "Wykres 2": "graph_2_screen",
-            "Wykres 3": "graph_3",
-            "Wykres 4": "graph_4"
+            "Symulacja 1": "graph_1",
+            "Symulacja 2": "graph_2_screen",
+            "Symulacja 3": "graph_3",
+            "Symulacja 4": "graph_4"
         }
+
+    @staticmethod
+    def prepare_log(log):
+        test_qty = len(log)
+        # loq = log.iloc[:, 2:6]
+        time1 = log['Time_1']
+        delivery = log['Delivery']
+        time2 = log['Time_2']
+        check_in = log['Check_in']
+        time3 = log['Time_3']
+        condi = log['Conditioning']
+
+        return [test_qty, time1, delivery, time2, check_in, time3, condi]
 
 
     def start(self):
@@ -169,49 +306,47 @@ class LtsBoxLayout(BoxLayout):
         i zapisuje do odpowiednich list.
         :return: None
         """
+
         for i in self.main_param:
             param = eval("self.main.ids.{}.text".format(i))
             self.main_param_lts.append(int(param))
         for i in self.event_param:
             param = eval("self.main.ids.{}.text".format(i))
             self.event_param_lts.append(int(param))
-        # print(type(self.main_param_lts[0]))
-        # print(self.event_param_lts)
 
-        sim = LTS.Manage(self.main_param_lts[0],
-                         self.main_param_lts[1],
-                         self.main_param_lts[2],
-                         self.main_param_lts[3],
-                         self.main_param_lts[4],
-                         self.main_param_lts[5],
-                         self.main_param_lts[6],
-                         self.main_param_lts[7],
-                         self.event_param_lts,
-                         self.time_format)
+        sim = LTSU.Manage(self.main_param_lts[0],
+                          self.main_param_lts[1],
+                          self.main_param_lts[2],
+                          self.main_param_lts[3],
+                          self.main_param_lts[4],
+                          self.main_param_lts[5],
+                          self.main_param_lts[6],
+                          self.main_param_lts[7],
+                          self.main_param_lts[8],
+                          self.main_param_lts[9],
+                          self.main_param_lts[10],
+                          self.main_param_lts[11])
         sim.sim_run()
-        #
-        # log = sim.real_time.log
-        # print(log)
 
+
+
+        # if len(self.graphs) < 4:
+        #     self.graphs.append(g)
+        # else:
+        #     # TODO: popup czy nadpisać pierwszy wykres
+        #     self.graphs.pop(self.graphs[0])
+        #     self.graphs.append(g)
+
+        self.graph_1_py.add_plot(self.prepare_log(g))
+
+    def slider_magic(self, instance, value):
+        print(int(value))
 
 
     def change_screen(self, screen_name):
         print(screen_name, self.screens[screen_name])
         self.screen_text_py.text = screen_name
         self.graphs_screens_py.current = self.screens[screen_name]
-
-    def time_format(self, value):
-        if value == "Minuty":
-            self.time_format = "min"
-        elif value == "Godziny":
-
-            self.time_format = "hrs"
-        elif value == "Dni":
-            self.time_format = "day"
-        elif value == "Miesiące":
-            self.time_format = "mnt"
-        elif value == "Lata":
-            self.time_format = "yer"
 
 class LtsApp(App):
     """

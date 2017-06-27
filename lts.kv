@@ -25,6 +25,8 @@
     main: main
     graphs_screens_py: graphs_screens_kv
     screen_text_py: screen_text_kv
+    graph_1_py: graph_1_kv
+    time_slider_py: time_slider_kv
 
     ActionBar:
         ActionView:
@@ -82,30 +84,30 @@
 
 
                     CustomLabel:
-                        id: label_tc_qty
-                        text: "Ilosc Komor:"
+                        id: label_project_qty
+                        text: "Ilosc Projektow:"
 
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: tc_qty
-                            height: label_tc_qty.size[1]
+                            id: project_qty
+                            height: label_project_qty.size[1]
                             hint_text: "qty"
                             text: "4"
                         QuestionButton:
-                            id: tc_text
-                            pos: label_tc_qty.x, label_tc_qty.texture_size[1] / 2
-                            height: label_tc_qty.size[1]
-                            on_release: root.questionpopup.open("tc_text")
+                            id: project_text
+                            pos: label_project_qty.x, label_project_qty.texture_size[1] / 2
+                            height: label_project_qty.size[1]
+                            on_release: root.questionpopup.open("project_text")
 
                     CustomLabel:
                         id: label_tc_cap
-                        text: "Pojemnoœæ komór:"
+                        text: "Pojemnoœæ komor:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
                             id: tc_cap
-                            height: label_tc_qty.size[1]
+                            height: label_tc_cap.size[1]
                             hint_text: "cap"
                             text: "20"
                         QuestionButton:
@@ -147,18 +149,18 @@
                             on_release: root.questionpopup.open("wich_text")
 
                     CustomLabel:
-                        id: label_trunks_qty
+                        id: label_trunk_time
                         text: "Trumny:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
-                            id: trunks_qty
-                            height: label_trunks_qty.size[1]
+                            id: trunk_time
+                            height: label_trunk_time.size[1]
                             hint_text: "qty/day"
                             text: "3"
                         QuestionButton:
                             id: trunk_text
-                            pos: label_trunks_qty.x, label_trunks_qty.texture_size[1] / 2
+                            pos: label_trunk_time.x, label_trunk_time.texture_size[1] / 2
                             height: label_trunks_qty.size[1]
                             on_release: root.questionpopup.open("trunk_text")
 
@@ -190,15 +192,6 @@
                                 height: label_frq_check_in.size[1]
                                 hint_text: "qty/h"
                                 text: "120"
-                            Spinner:
-                                text: "Minuty"
-                                values: ["Minuty", "Godziny", "Dni", "Miesi?ce", "Lata"]
-                                size_hint_y: None
-                                height: label_frq_check_in.size[1]
-                                width: frq_check_in_box.size[0] / 2
-
-                                id: time_format
-                                on_text: root.time_format(time_format.text)
                         QuestionButton:
                             id: frq_text
                             pos: label_frq_check_in.x, label_frq_check_in.texture_size[1] / 2
@@ -320,8 +313,6 @@
         Label:
             size_hint_x: None
             width: 2
-#            borders: 2, 'solid', (1, 1, 1, 1)
-#            color: (0, 0, 0, 0)
             canvas.before:
                 Color:
                     rgba: .2, .2, .2, 1
@@ -344,8 +335,8 @@
                     BoxLayout:
                         size_hint_x: .4
                         Spinner:
-                            text: "Wykres"
-                            values: ["Wykres 1", "Wykres 2", "Wykres 3", "Wykres 4"]
+                            text: "Symulacja"
+                            values: ["Symulacja 1", "Symulacja 2", "Symulacja 3", "Symulacja 4"]
                             id: graphs_spinner_kv
                             on_text: root.change_screen(graphs_spinner_kv.text)
 
@@ -363,24 +354,34 @@
                     Graph_4:
                         id: graph_4_kv
                         name: "graph_4"
-
             BoxLayout:
-                size_hint_y: .06
-                padding: 2
-                spacing: 2
-                Button:
-                    text: 'Param wykres 1'
-                Button:
-                    text: 'Param wykres 2'
-                Button:
-                    text: 'Param wykres 3'
-                Button:
-                    text: 'Param wykres 4'
+                orientation: 'vertical'
+                size_hint_y: .1
+                spacing: 15
+                padding: 100, 0, 100, 0
+                Slider:
+                    id: time_slider_kv
+                    min: 0
+                    max: 100
+                    on_value: root.slider_magic(*args)
+                BoxLayout:
+                    size_hint_y: None
+                    height: '40dp'
+                    padding: 300, 0, 300, 0
+                    BoxLayout:
+                        Label:
+                            text: 'Zmiana czasu wykresu'
+                        Label:
+                            text: str(int(time_slider_kv.value)) + ' sek'
+
 
 
 <Graph_1>:
-    id: graph_1_kv
-
+    BoxLayout:
+        size_hint_y: .09
+        padding: 100, 0, 100, 10
+        spacing: 2
+        orientation: 'vertical'
 
 
 <Graph_2_Screen>:
@@ -391,13 +392,11 @@
 
 <Graph_3>:
     id: graph_3_kv
-    Label:
-        text: "Wykres 3"
+
 
 <Graph_4>:
     id: graph_4_kv
-    Label:
-        text: "Wykres 4"
+
 
 <QuestionPopup>:
     size_hint: 0.3, None
