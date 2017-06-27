@@ -27,6 +27,7 @@
     screen_text_py: screen_text_kv
     graph_1_py: graph_1_kv
     time_slider_py: time_slider_kv
+    excel_py: excel_kv
 
     ActionBar:
         ActionView:
@@ -36,11 +37,9 @@
                 app_icon: "logo.png"
                 title: "Symulacja procesu COP"
             ActionButton:
-                text: "Button 1"
-            ActionButton:
-                text: "Button 2"
-            ActionButton:
+                id: excel_kv
                 text: "Exportuj do excela"
+                on_release: root.export.export_show()
             ActionButton:
                 text: "Ustawienia"
                 on_release: app.open_settings()
@@ -66,6 +65,7 @@
                     cols: 2
                     row_force_default: True
                     row_default_height: 40
+
                     CustomLabel:
                         id: label_test_qty
                         text: "Iloœæ testów:"
@@ -85,15 +85,14 @@
 
                     CustomLabel:
                         id: label_project_qty
-                        text: "Ilosc Projektow:"
-
+                        text: "Iloœæ Projektów:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
                             id: project_qty
                             height: label_project_qty.size[1]
                             hint_text: "qty"
-                            text: "4"
+                            text: "6"
                         QuestionButton:
                             id: project_text
                             pos: label_project_qty.x, label_project_qty.texture_size[1] / 2
@@ -102,7 +101,7 @@
 
                     CustomLabel:
                         id: label_tc_cap
-                        text: "Pojemnoœæ komor:"
+                        text: "Pojemnoœæ komór:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -118,14 +117,14 @@
 
                     CustomLabel:
                         id: label_tr_qty
-                        text: "Ilosc TR:"
+                        text: "Iloœæ TR:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
                             id: tr_qty
                             height: label_tr_qty.size[1]
                             hint_text: "qty"
-                            text: "2"
+                            text: "4"
                         QuestionButton:
                             id: tr_text
                             pos: label_tr_qty.x, label_tr_qty.texture_size[1] / 2
@@ -134,14 +133,14 @@
 
                     CustomLabel:
                         id: label_trunk_cap
-                        text: "Trumny:"
+                        text: "Pojemnoœæ trumny:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
                             id: trunk_cap
                             height: label_trunk_cap.size[1]
                             hint_text: "qty/day"
-                            text: "3"
+                            text: "80"
                         QuestionButton:
                             id: trunk_text
                             pos: label_trunk_cap.x, label_trunk_cap.texture_size[1] / 2
@@ -157,7 +156,7 @@
                             id: at_qty
                             height: label_at_qty.size[1]
                             hint_text: "qty"
-                            text: "4"
+                            text: "6"
                         QuestionButton:
                             id: at_qty_text
                             pos: label_at_qty.x, label_at_qty.texture_size[1] / 2
@@ -166,7 +165,7 @@
 
                     CustomLabel:
                         id: label_tc_refill_time
-                        text: "Wrzuty:"
+                        text: "Czêstoœæ wrzutów:"
                     BoxLayout:
                         orientation: 'horizontal'
                         BoxLayout:
@@ -193,6 +192,7 @@
                     cols: 2
                     row_force_default: True
                     row_default_height: 40
+
                     CustomLabel:
                         id: label_delivery_time
                         text: "Czas transportu:"
@@ -202,7 +202,7 @@
                             id: delivery_time
                             height: label_delivery_time.size[1]
                             hint_text: "time"
-                            text: "120"
+                            text: "60"
                         QuestionButton:
                             id: transport_text
                             pos: label_delivery_time.x, label_delivery_time.texture_size[1] / 2
@@ -210,7 +210,7 @@
 
                     CustomLabel:
                         id: label_check_in_time
-                        text: "Czas Check_in:"
+                        text: "Czas przyjecia modu³ów:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -225,7 +225,7 @@
 
                     CustomLabel:
                         id: label_conditioning_time
-                        text: "Czas Condi:"
+                        text: "Czas kondycjonowania:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -240,7 +240,7 @@
 
                     CustomLabel:
                         id: label_deployment_time
-                        text: "Bum time:"
+                        text: "Czas testu:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -255,7 +255,7 @@
 
                     CustomLabel:
                         id: label_analysis_time
-                        text: "Anal time:"
+                        text: "Czas analizy:"
                     BoxLayout:
                         orientation: 'horizontal'
                         CustomTextInput:
@@ -321,33 +321,34 @@
                         id: graph_4_kv
                         name: "graph_4"
             BoxLayout:
-                orientation: 'vertical'
+                orientation: 'horizontal'
                 size_hint_y: .1
-                spacing: 15
-                padding: 100, 0, 100, 0
-                Slider:
-                    id: time_slider_kv
-                    min: 0
-                    max: 100
-                    on_value: root.slider_magic(*args)
                 BoxLayout:
-                    size_hint_y: None
-                    height: '40dp'
-                    padding: 300, 0, 300, 0
-                    BoxLayout:
-                        Label:
-                            text: 'Zmiana czasu wykresu'
-                        Label:
-                            text: str(int(time_slider_kv.value)) + ' sek'
 
+                    orientation: 'vertical'
+
+                    spacing: 15
+                    padding: 100, 0, 100, 0
+                    Slider:
+                        id: time_slider_kv
+                        on_value: root.slider_magic(*args)
+                    BoxLayout:
+                        size_hint_y: None
+                        height: '40dp'
+                        padding: 300, 0, 300, 0
+                        BoxLayout:
+                            Label:
+                                text: 'Zmiana czasu wykresu'
+                            Label:
+                                text: str(int(time_slider_kv.value)) + ' %'
+                Button:
+                    size_hint_x: .2
+                    text: 'Odœwierz'
+                    on_release: root.refresh()
 
 
 <Graph_1>:
-    BoxLayout:
-        size_hint_y: .09
-        padding: 100, 0, 100, 10
-        spacing: 2
-        orientation: 'vertical'
+    #id: graph_1_kv
 
 
 <Graph_2_Screen>:
@@ -392,3 +393,39 @@
             size_hint: 1, None
             height: '40dp'
             on_release: root.dismiss()
+
+
+<ExcelPopup>:
+    size_hint: .5, .5
+    #height: popup_content.height + 50
+    title: "Export do excela"
+    title_size: 25
+    BoxLayout:
+        auto_dismiss: False
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        #fulscreen: True
+
+        FileChooserIconView:
+            id: filechooser
+
+            path: "C:\\Users\\mateusz.sobek\\Desktop\\Logi_sim_run"
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Label:
+                size_hint_x: .4
+            TextInput:
+                id: file_text
+                hint: 'Nazwa pliku z rozszerzeniem'
+                text: ''
+            Button:
+                text: "Zapisz"
+                on_release: root.save(filechooser.path, filechooser.text)
+            Button:
+                text: "Anuluj"
+                on_release: root.dismiss()
+            Label:
+                size_hint_x: .4

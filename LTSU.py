@@ -84,8 +84,8 @@ class Manage:
             self.real_time += 1
             if len(self.test_list) == len(self.finished):
                 simulation = False
-        print(self.simDF)
-        return self.simDF
+        # print(self.simDF)
+        return self.simDF, self.real_time
 
     def event_run(self, test):
         # od tyłu jest fajniej

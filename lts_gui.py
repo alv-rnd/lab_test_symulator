@@ -8,6 +8,7 @@ import numpy as np
 import math
 import pandas as pd
 import os
+import datetime
 
 from kivy.app import App
 from kivy.uix.popup import Popup
@@ -105,7 +106,7 @@ class Graph_1(Screen):
         nav = NavigationToolbar(wid)
         return nav.actionbar
 
-    def get_fc(self, log):
+    def get_fc(self, log, time=None):
 
         width = 0.5
 
@@ -115,12 +116,12 @@ class Graph_1(Screen):
         #
         # statusy = ['Delivery', 'Check in', 'Conditioning', 'Deployment', 'Analisys', 'Finish']
 
-        x = [1, 2, 3]
-        statusy = ['Delivery', 'Check in', 'Conditioning']
-        y = [log[0], log[0], log[0]]
+        x = [1, 2, 3, 4, 5, 6]
+        statusy = ['Delivery', 'Check in', 'Conditioning', 'Deployment', 'Analisys', 'Finish']
+        y = [log[1], log[2], log[3], log[4], log[5], log[6]]
 
         fig = plt.figure(facecolor='none')
-        ax = fig.add_subplot(111, animated=True)
+        ax = fig.add_subplot(111)
         ax.set_facecolor('none')
         ax.spines['bottom'].set_color('white')
         ax.spines['top'].set_color('none')
@@ -141,7 +142,7 @@ class Graph_1(Screen):
         plt.xticks(x, statusy)
         plt.xlabel('Statusy testów', color='white', fontsize=16)
         plt.ylabel('Ilość testów', color='white', fontsize=16)
-        plt.title('Symulacja {}'.format(1), color='white', fontsize=20)
+        plt.title('Symulacja {} - {} min'.format(1, (0 if time == None else round(time, 0))), color='white', fontsize=20)
         plt.legend()
 
         # ani = FuncAnimation(fig, update, frames=120, bl)
@@ -152,27 +153,26 @@ class Graph_1(Screen):
         # fig.canvas.mpl_connect('figure_leave_event', leave_figure)
         # fig.canvas.mpl_connect('axes_enter_event', enter_axes)
         # fig.canvas.mpl_connect('axes_leave_event', leave_axes)
-        fig.canvas.mpl_connect('button_press_event', press)
-        fig.canvas.mpl_connect('button_release_event', release)
-        fig.canvas.mpl_connect('key_press_event', keypress)
-        fig.canvas.mpl_connect('key_release_event', keyup)
-        fig.canvas.mpl_connect('motion_notify_event', motionnotify)
-        fig.canvas.mpl_connect('resize_event', resize)
-        fig.canvas.mpl_connect('scroll_event', scroll)
-        fig.canvas.mpl_connect('figure_enter_event', figure_enter)
-        fig.canvas.mpl_connect('figure_leave_event', figure_leave)
-        fig.canvas.mpl_connect('close_event', close)
+        # fig.canvas.mpl_connect('button_press_event', press)
+        # fig.canvas.mpl_connect('button_release_event', release)
+        # fig.canvas.mpl_connect('key_press_event', keypress)
+        # fig.canvas.mpl_connect('key_release_event', keyup)
+        # fig.canvas.mpl_connect('motion_notify_event', motionnotify)
+        # fig.canvas.mpl_connect('resize_event', resize)
+        # fig.canvas.mpl_connect('scroll_event', scroll)
+        # fig.canvas.mpl_connect('figure_enter_event', figure_enter)
+        # fig.canvas.mpl_connect('figure_leave_event', figure_leave)
+        # fig.canvas.mpl_connect('close_event', close)
 
 
 
         return wid
 
-    def add_plot(self, log):
-
+    def add_plot(self, log, real_time=None):
+        self.clear_widgets()
         # wid = self.get_fc()
-        self.add_widget(self.get_fc(log))
+        self.add_widget(self.get_fc(log, real_time))
         # self.add_widget(self.get_nav(wid))
-
 
 class Graph_2_Screen(Screen):
     def __init__(self, *args, **kwargs):
@@ -213,6 +213,19 @@ class Graph_4(Screen):
         super(Graph_4, self).__init__(**kwargs)
 
 
+class ExcelPopup(Popup):
+    def __init__(self, *args, **kwargs):
+        super(ExcelPopup, self).__init__(**kwargs)
+
+    def export_show(self):
+        super(ExcelPopup, self).open()
+
+    def save(self, path, filename):
+        pass
+
+    # def popup_dissmis(self):
+    #         return self.dismiss()
+
 class QuestionPopup(Popup):
 
     question_dict = {
@@ -248,7 +261,6 @@ class QuestionPopup(Popup):
 #     self.
 
 
-
 class LtsBoxLayout(BoxLayout):
     """
     Główny wygląd programu, zawierają się w nim wszystkie widgety
@@ -263,6 +275,8 @@ class LtsBoxLayout(BoxLayout):
     def __init__(self, *args, **kwargs):
         super(LtsBoxLayout, self).__init__(**kwargs)
         self.questionpopup = QuestionPopup()
+        self.export = ExcelPopup()
+        self.real_time = 100
         self.main_param = ['test_qty',
                  'project_qty',
                  'tc_cap',
@@ -285,20 +299,35 @@ class LtsBoxLayout(BoxLayout):
             "Symulacja 3": "graph_3",
             "Symulacja 4": "graph_4"
         }
+        self.slid = 0
+        self.log = None
+        # self.graph_1_py =
 
     @staticmethod
-    def prepare_log(log):
-        test_qty = len(log)
-        # loq = log.iloc[:, 2:6]
-        time1 = log['Time_1']
-        delivery = log['Delivery']
-        time2 = log['Time_2']
-        check_in = log['Check_in']
-        time3 = log['Time_3']
-        condi = log['Conditioning']
+    def prepare_log(log, slider=None):
+        test_qty = 0 #len(log)
 
-        return [test_qty, time1, delivery, time2, check_in, time3, condi]
+        # slider = 400
 
+        #delivery = log['Delivery'][log['Time_0'] < slider][log['Time_1'] > slider]
+        delivery = len(log['Delivery'][log['Time_0'] < slider][log['Time_1'] > slider])
+
+        # check_in = log['Check_in'][log['Time_1'] < slider][log['Time_2'] > slider]
+        check_in = len(log['Check_in'][log['Time_1'] < slider][log['Time_2'] > slider])
+
+        # conditioning = log['Conditioning'][log['Time_2'] < slider][log['Time_3'] > slider]
+        conditioning = len(log['Conditioning'][log['Time_2'] < slider][log['Time_3'] > slider])
+
+        # deployment = log['Deployment'][log['Time_3'] < slider][log['Time_4'] > slider]
+        deployment = len(log['Deployment'][log['Time_3'] < slider][log['Time_4'] > slider])
+
+        # analysis = log['Analysis'][log['Time_4'] < slider][log['Time_5'] > slider]
+        analysis = len(log['Analysis'][log['Time_4'] < slider][log['Time_5'] > slider])
+
+        # finished = log['Finished'][log['Time_5'] < slider]
+        finished = len(log['Finished'][log['Time_5'] < slider])
+
+        return [test_qty, delivery, check_in, conditioning, deployment, analysis, finished]
 
     def start(self):
         """
@@ -326,22 +355,37 @@ class LtsBoxLayout(BoxLayout):
                           self.main_param_lts[9],
                           self.main_param_lts[10],
                           self.main_param_lts[11])
-        # sim.sim_run()
+
+        sim1 = sim.sim_run()
+        self.log = sim1[0]
+        self.real_time = sim1[1]
 
 
+        path_to_export = 'C:\\Users\mateusz.sobek\Desktop\Logi_sim_run\log_{}.xlsx'.format('1')
 
+        self.log.to_excel(path_to_export)
         # if len(self.graphs) < 4:
         #     self.graphs.append(g)
         # else:
         #     # TODO: popup czy nadpisać pierwszy wykres
         #     self.graphs.pop(self.graphs[0])
         #     self.graphs.append(g)
+        # print(self.prepare_log(log))
+        self.graph_1_py.add_plot(self.prepare_log(self.log))
 
-        self.graph_1_py.add_plot(self.prepare_log(sim.sim_run()))
+    def export_excel(self):
+        pass
 
     def slider_magic(self, instance, value):
-        print(int(value))
 
+        self.slid = value * self.real_time / 100
+
+    def refresh(self):
+        # self.graph_1_py.remove_plot()
+        if self.log is None:
+            pass
+        else:
+            self.graph_1_py.add_plot(self.prepare_log(self.log, self.slid), self.slid)
 
     def change_screen(self, screen_name):
         print(screen_name, self.screens[screen_name])
