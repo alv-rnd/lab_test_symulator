@@ -7,14 +7,28 @@ import os
 
 class Manage:
 
-    def __init__(self):
+    def __init__(self,
+                 test_qty,
+                 project_qty,
+                 tc_cap,
+                 tr_qty,
+                 trunk_cap,
+                 delivery_time,
+                 check_in_time,
+                 conditioning_time,
+                 tc_refill_time,
+                 deployment_time,
+                 analysis_time,
+                 at_qty):
+
+
         self.real_time = 0
-        self.time_of_delivery = 60
-        self.time_of_check_in = 20
-        self.time_of_conditioning = 240
-        self.TC_refill_time = 120
-        self.time_of_deployment = 20
-        self.time_of_analysis = 20
+        self.time_of_delivery = delivery_time
+        self.time_of_check_in = check_in_time
+        self.time_of_conditioning = conditioning_time
+        self.TC_refill_time = tc_refill_time
+        self.time_of_deployment = deployment_time
+        self.time_of_analysis = analysis_time
 
 
 
@@ -23,30 +37,19 @@ class Manage:
         self.test_list = []
         self.rsc_list = []
         self.finished = []
-        self.project_qty = 5
-        self.test_qty = 100
-        self.tr_qty = 4
-        # self.wich_qty = wich_qty
-        self.at_qty = 4
-        self.trunk_qty = 50
-        self.tc_cap = 8
+        self.project_qty = project_qty
+        self.test_qty = test_qty
+        self.tr_qty = tr_qty
+        self.at_qty = at_qty
+        self.trunk_cap = trunk_cap
+        self.tc_cap = tc_cap
 
         # testy
         self.project_list = list(range(1, self.project_qty + 1))
         self.gen_tests(self.test_qty, self.project_list)
 
-        # tempD = {}
-        # for test in self.test_list:
-        #     if test.temp != 23:
-        #         if str(test.temp) not in tempD.keys() and test.temp != 23:
-        #             tempD[str(test.temp)] = 1
-        #         else:
-        #             tempD[str(test.temp)] += 1
-
-
-        # TC_qty = len(tempD.values())
         # tworzenie zasobów
-        self.rsc_list.append(RSC('TrumnaAPA', self.trunk_qty, None, r_source='New'))
+        self.rsc_list.append(RSC('TrumnaAPA', self.trunk_cap, None, r_source='New'))
         self.rsc_list.append(RSC('StorageLAB', 0, None, r_source='Delivery'))
         self.rsc_list.append([RSC('TC_RT', 0, 23, r_source='Check_in'), RSC('TC_1', self.tc_cap, -35, r_source='Check_in'),
                               RSC('TC_2', self.tc_cap, -30, r_source='Check_in'), RSC('TC_3', self.tc_cap, 60, r_source='Check_in'),
@@ -54,17 +57,14 @@ class Manage:
                               RSC('TC_6', self.tc_cap, 90, r_source='Check_in')])
         self.gen_RSC(self.tr_qty, 'TR', 1)
         self.gen_RSC(self.at_qty, 'AT', 1)
+
         self.rsc_list[3].insert(self.tr_qty + 1, RSC('WICH_1', 1, None,r_source='Conditioning', inout='IN'))
         self.rsc_list[3].insert(self.tr_qty + 2, RSC('WICH_2', 1, None,r_source='Conditioning', inout='IN'))
 
         # print([rsc for rsc in self.rsc_list])
-        # #
         # print([rsc.name for rsc in self.rsc_list[2]])
         # print([rsc.name for rsc in self.rsc_list[3]])
         # print([rsc.name for rsc in self.rsc_list[4]])
-
-        # TODO: ustawienie temp TCków - może funkjce badającą rozkłąd temp i ust
-        # TODO: komór względem temp występującj najdczęściej
 
         # tworzenie DFa
         self.simDF = None
@@ -82,10 +82,6 @@ class Manage:
                     if prev_time == test.ready_time:
                         test.ready_time += 1
             self.real_time += 1
-            # print(self.real_time)
-            # if self.real_time == 1000:
-            #     print([test.name for test in self.rsc_list[1].in_progress])
-            #     break
             if len(self.test_list) == len(self.finished):
                 simulation = False
         print(self.simDF)
@@ -143,7 +139,6 @@ class Manage:
             if rsc.limit > len(rsc.in_progress):
                 rsc.in_progress.append(test)
                 test.set_status(status)
-                # test.set_location(rsc)
                 test.time_update(event_time)
 
             self.simDF.loc[test.name]['Time_0'] = self.real_time
@@ -169,15 +164,10 @@ class Manage:
                 prev_rsc_prog.remove(test)
             rsc.in_progress.append(test)
             test.set_status(status)
-            # test.set_location(rsc)
             test.time_update(event_time)
 
             self.simDF.loc[test.name]['Time_1'] = self.real_time
             self.simDF.loc[test.name][status] = rsc.name
-
-        # cols = ['Time_0', 'Delivery', 'Time_1', 'Check_in', 'Time_2',
-        #         'Conditioning', 'Time_3', 'Deployment', 'Time_4', 'Analisys',
-        #         'Time_5', 'Final', 'kind', 'project', 'temp', 'result']
 
     def ev_conditioning(self, test):
         if test.temp == 23:
@@ -196,12 +186,10 @@ class Manage:
         prev_rsc_prog = self.rsc_list[1].in_progress
 
         rsc = test.check_rsc_parameter_cond(self.rsc_list[2])
-        # print('rsc temp', rsc.temp, 'test temp', test.temp)
         if test_sum < int(tr_count * TC_fill / self.time_of_deployment):
             if rsc:
                 rsc.in_progress.append(test)
                 test.set_status(status)
-                # test.set_location(rsc)
                 test.time_update(event_time)
 
                 self.simDF.loc[test.name]['Time_2'] = self.real_time
@@ -210,7 +198,6 @@ class Manage:
             prev_rsc_prog.remove(test)
 
     def ev_deployment(self, test):
-
 
         event_time =(self.time_of_deployment if test.inout == 'OUT' else self.time_of_deployment + 30)
         status = 'Deployment'
@@ -221,7 +208,6 @@ class Manage:
         if rsc:
             rsc.in_progress.append(test)
             test.set_status(status)
-            # test.set_location(rsc)
             test.time_update(event_time)
 
             self.simDF.loc[test.name]['Time_3'] = round(self.real_time, -1)
@@ -240,7 +226,6 @@ class Manage:
         if rsc:
             rsc.in_progress.append(test)
             test.set_status(status)
-            # test.set_location(rsc)
             test.time_update(event_time)
 
             self.simDF.loc[test.name]['Time_4'] = self.real_time
@@ -255,7 +240,6 @@ class Manage:
         status = 'Finished'
         prev_rsc_list = self.rsc_list[4]
         test.set_status(status)
-        # test.set_location(status)
 
         self.simDF.loc[test.name]['Time_5'] = self.real_time
         self.simDF.loc[test.name][status] = status
@@ -264,9 +248,6 @@ class Manage:
         for rsc in prev_rsc_list:
             if test in rsc.in_progress:
                 rsc.in_progress.remove(test)
-        # cols = ['Time_0', 'Delivery', 'Time_1', 'Check_in', 'Time_2',
-        #         'Conditioning', 'Time_3', 'Deployment', 'Time_4', 'Analisys',
-        #         'Time_5', 'Finished', 'kind', 'project', 'temp', 'result']
 
     def gen_tests(self, qty, project):
 
@@ -294,8 +275,6 @@ class Manage:
         cols = ['Time_0', 'Delivery', 'Time_1', 'Check_in', 'Time_2',
                 'Conditioning', 'Time_3', 'Deployment', 'Time_4', 'Analysis',
                 'Time_5', 'Finished', 'Group', 'Project', 'Temp', 'Result']
-
-        # cols = ['Test_No', 'Time', 'Project', 'Group', 'Status', 'RSC', 'Result_eval']
 
         self.simDF = pd.DataFrame(columns=cols, index=[test.name for test in self.test_list])
 
@@ -359,11 +338,6 @@ class Module:
     def set_status(self, status):
         self.status = status
 
-    # def set_location(self, rsc):
-    #     if not self.location == None:
-    #         self.location.in_progress.remove(self)
-    #     self.location = rsc
-
     def set_temp(self):
 
         pos = self.get_proj_min_value_pos()
@@ -394,12 +368,10 @@ class Module:
             self.proj_dict[self.project] = temps
             self.proj_cache[self.project] = [0, 0, 0]
 
-
     def get_proj_min_value_pos(self):
 
         min_val = min(self.proj_cache[self.project])
         pos = self.proj_cache[self.project].index(min_val)
-
         return pos
 
     def check_rsc_parameter_cond(self, rsc_list):
@@ -419,7 +391,6 @@ class Module:
                     return rsc
                 elif rsc.inout == 'OUT' and self.inout == 'OUT':
                     return rsc
-                # return rsc
 
     def check_rsc_parameter_anal(self, rsc_list):
 
@@ -427,26 +398,10 @@ class Module:
             if len(rsc.in_progress) == 0:
                 return rsc
 
-    # def check_rsc_parameter_Cond(self, rsc_list):
-    #     tc_lst = []
-    #     for rsc in rsc_list:
-    #         if rsc.r_source == 'Check_in':
-    #             tc_lst.append(rsc)
-    #     print([tc.name for tc in tc_lst])
-    #     for rsc in tc_lst:
-    #         if self.temp == rsc.temp:
-    #             return rsc
-
-
-
-        # można tu póżniej dodać param level określający ilość parametrów,
-        # jaką ma badać dla danego eventu funkcja, np 0 - tylko temp, 1, stage, potem wielkość itp itd
-
     def time_update(self, event_time):
         self.ready_time += event_time
 
-
-sim = Manage()
-sim.sim_run()
+# sim = Manage()
+# sim.sim_run()
 
 
