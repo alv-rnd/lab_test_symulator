@@ -23,33 +23,36 @@ class Manage:
 
         # testy
         self.project_list = list(range(1, 5+1))
-        self.gen_tests(100, self.project_list)
-
-        tempD = {}
-        for test in self.test_list:
-            if not test.temp == 23:
-                if str(test.temp) not in tempD.keys() and test.temp != 23:
-                    tempD[str(test.temp)] = 1
-                else:
-                    tempD[str(test.temp)] += 1
-
-
-        TC_qty = len(tempD.values())
+        self.gen_tests(200, self.project_list)
 
         # tworzenie zasobów
-        self.rsc_list.append(RSC('TrumnaAPA', 0, None, r_source='New'))
+        self.rsc_list.append(RSC('TrumnaAPA', 50, None, r_source='New'))
         self.rsc_list.append(RSC('StorageLAB', 0, None, r_source='Delivery'))
         self.rsc_list.append(RSC('TC_RT', 0, 23, r_source='Check_in'))
-        self.gen_RSC(TC_qty, 'TC', 8, r_source='Check_in')
+        self.rsc_list.append(RSC('TC_1', 8, -35, r_source='Check_in'))
+        self.rsc_list.append(RSC('TC_2', 8, -30, r_source='Check_in'))
+        self.rsc_list.append(RSC('TC_3', 8, 60, r_source='Check_in'))
+        self.rsc_list.append(RSC('TC_4', 8, 80, r_source='Check_in'))
+        self.rsc_list.append(RSC('TC_5', 8, 85, r_source='Check_in'))
+        self.rsc_list.append(RSC('TC_6', 8, 90, r_source='Check_in'))
         self.gen_RSC(4, 'TR', 1, r_source='Conditioning')
         self.gen_RSC(4, 'AT', 1, r_source='Deployment', queue=True)
 
 
-
-        for tc in self.rsc_list:
-            if tc.r_source == 'Check_in':
-                for temp in tempD.keys():
-                    tc.set_temp(int(temp))
+        # tempD = {}
+        # for test in self.test_list:
+        #     if not test.temp == 23:
+        #         if str(test.temp) not in tempD.keys():
+        #             tempD[str(test.temp)] = 1
+        #         else:
+        #             tempD[str(test.temp)] += 1
+        #
+        #
+        # TC_qty = len(tempD.values())
+        # for tc in self.rsc_list:
+        #     if tc.r_source == 'Check_in':
+        #         for temp in tempD.keys():
+        #             tc.set_temp(int(temp))
 
         # TODO: ustawienie temp TCków - może funkjce badającą rozkłąd temp i ust
         # TODO: komór względem temp występującj najdczęściej
@@ -65,26 +68,26 @@ class Manage:
         simulation = True
 
         while simulation:
+
+
             for test in self.test_list:
                 if test.ready_time == self.real_time:
                     self.event_run(test)
             self.real_time += 1
             if len(self.test_list) == len(self.finished):
                 simulation = False
-        print(self.simDF)
+        print(self.simDF.head(100))
         return self.simDF
 
     def event_run(self, test):
         # od tyłu jest fajniej
+        start_time = test.ready_time
+
         if test.status == 'Analysis':
             #Finito
-
-            print(self.real_time, 'Finito')
             self.ev_finito(test)
         elif test.status == 'Deployment':
             #Anlysis
-            print(self.simDF)
-            print(self.real_time, 'Analysis')
             self.ev_analysis(test)
         elif test.status == 'Conditioning':
             #Deployment
@@ -99,6 +102,7 @@ class Manage:
             #Delivery
             self.ev_delivery(test)
 
+        if start_time == test.ready_time: test.time_update(1)
 
     def ev_delivery(self, test):
 
@@ -141,7 +145,7 @@ class Manage:
         #         'Time_5', 'Final', 'kind', 'project', 'temp', 'result']
 
     def ev_conditioning(self, test):
-        event_time = self.time_of_conditioning
+        event_time = (1 if test.temp ==23 else self.time_of_conditioning)
         status = 'Conditioning'
         TC_fill = self.TC_refill_time
         test_sum = 0
@@ -155,15 +159,12 @@ class Manage:
             if tr.r_source == 'Conditioning':
                 tr_count += 1
 
-        rsc = test.check_rsc_parameter_Cond(self.rsc_list)
+        rsc = test.check_rsc_parameter(self.rsc_list)
         if test_sum < int(tr_count * TC_fill / self.time_of_deployment):
             if not rsc == False:
-                print(rsc, rsc.temp, rsc.name)
                 rsc.add_to_in_progress(test)
                 test.set_status(status)
                 test.set_location(rsc)
-                if test.temp == 23:
-                    event_time = 0
                 test.time_update(event_time)
 
                 self.simDF.loc[test.name]['Time_2'] = self.real_time
@@ -172,7 +173,6 @@ class Manage:
     def ev_deployment(self, test):
         event_time = self.time_of_deployment
         status = 'Deployment'
-
         rsc = test.check_rsc_parameter(self.rsc_list)
         if not rsc == False:
             rsc.add_to_in_progress(test)
@@ -188,7 +188,6 @@ class Manage:
         status = 'Analysis'
 
         rsc = test.check_rsc_parameter(self.rsc_list)
-        print(rsc.name)
         if not rsc == False:
             rsc.add_to_in_progress(test)
             test.set_status(status)
@@ -233,7 +232,7 @@ class Manage:
     def gen_DF(self):
 
         cols = ['Time_0', 'Delivery', 'Time_1', 'Check_in', 'Time_2',
-                'Conditioning', 'Time_3', 'Deployment', 'Time_4', 'Analisys',
+                'Conditioning', 'Time_3', 'Deployment', 'Time_4', 'Analysis',
                 'Time_5', 'Finished', 'Group', 'Project', 'Temp', 'Result']
 
         # cols = ['Test_No', 'Time', 'Project', 'Group', 'Status', 'RSC', 'Result_eval']
@@ -348,19 +347,6 @@ class Module:
                     else:
                         return rsc
         return False
-
-    def check_rsc_parameter_Cond(self, rsc_list):
-        tc_lst = []
-        for rsc in rsc_list:
-            if rsc.r_source == 'Check_in':
-                tc_lst.append(rsc)
-        print([tc.name for tc in tc_lst])
-        for rsc in tc_lst:
-            if rsc.limit == 0 or rsc.limit > len(rsc.in_progress):
-                if self.temp == rsc.temp:
-                    return rsc
-
-
 
         # można tu póżniej dodać param level określający ilość parametrów,
         # jaką ma badać dla danego eventu funkcja, np 0 - tylko temp, 1, stage, potem wielkość itp itd
