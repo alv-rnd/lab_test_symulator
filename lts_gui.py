@@ -142,7 +142,7 @@ class Graph_1(Screen):
         plt.xticks(x, statusy)
         plt.xlabel('Statusy testów', color='white', fontsize=16)
         plt.ylabel('Ilość testów', color='white', fontsize=16)
-        plt.title('Symulacja {} - {} min'.format(1, (0 if time == None else round(time, 0))), color='white', fontsize=20)
+        plt.title('Symulacja {} - {} min ({} hrs)'.format(1, (0 if time == None else round(time, 0)), 0 if time == None else round(time / 60, 1)), color='white', fontsize=20)
         plt.legend()
 
         for react in b1:
