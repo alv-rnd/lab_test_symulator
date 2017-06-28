@@ -186,7 +186,7 @@ class Manage:
         prev_rsc_prog = self.rsc_list[1].in_progress
 
         rsc = test.check_rsc_parameter_cond(self.rsc_list[2])
-        if test_sum < int(tr_count * TC_fill / self.time_of_deployment):
+        if TC_fill == 0:
             if rsc:
                 rsc.in_progress.append(test)
                 test.set_status(status)
@@ -194,8 +194,20 @@ class Manage:
 
                 self.simDF.loc[test.name]['Time_2'] = self.real_time
                 self.simDF.loc[test.name][status] = rsc.name
-        if test in prev_rsc_prog:
-            prev_rsc_prog.remove(test)
+            if test in prev_rsc_prog:
+                prev_rsc_prog.remove(test)
+
+        elif TC_fill > 0:
+            if test_sum < int(tr_count * TC_fill / self.time_of_deployment):
+                if rsc:
+                    rsc.in_progress.append(test)
+                    test.set_status(status)
+                    test.time_update(event_time)
+
+                    self.simDF.loc[test.name]['Time_2'] = self.real_time
+                    self.simDF.loc[test.name][status] = rsc.name
+                if test in prev_rsc_prog:
+                    prev_rsc_prog.remove(test)
 
     def ev_deployment(self, test):
 
@@ -367,6 +379,8 @@ class Module:
 
             self.proj_dict[self.project] = temps
             self.proj_cache[self.project] = [0, 0, 0]
+
+        print(self.proj_cache)
 
     def get_proj_min_value_pos(self):
 

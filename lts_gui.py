@@ -118,7 +118,7 @@ class Graph_1(Screen):
 
         x = [1, 2, 3, 4, 5, 6]
         statusy = ['Delivery', 'Check in', 'Conditioning', 'Deployment', 'Analisys', 'Finish']
-        y = [log[1], log[2], log[3], log[4], log[5], log[6]]
+        y = [log[1], log[2], log[3], log[4], log[5], log[6] / 10]
 
         fig = plt.figure(facecolor='none')
         ax = fig.add_subplot(111)
@@ -251,11 +251,17 @@ class QuestionPopup(Popup):
 
     question_dict = {
     'test_text': "Ilość modułów wyprodukowanych w APA.",
-    'tc_text': "Ilość komór temperaturowych gdzie będą kondycjonowane moduły.",
-    'tr_text': "Ilość Test Roomów w których będą odbywać się testy.",
-    'wich_text': "Ilość komór Walk-in w których będą odbywać się testy.",
-    'trunk_text': "Ilość transportów z APA na dzień.",
-    'frq_text': "Częstotliwość dokładania modułów do TC przez technika wsparcia (ustaw 0 jeżeli moduły mają być dokłądane od razu). "
+    'project_text': "Ilość możliwych do wygenerowania projektów.",
+    'tc_cap_text': "Pojemność komór do kondycjonowania modułów.",
+    'tr_text': "Ilość pomieszczeń testowych.",
+    'trunk_text': "Pojemność tumny.",
+    'at_qty_text': "Ilosć stołów do analizy.",
+    'tc_refill_time_text': "Częstość wrzutów do komr kondycjonujących.",
+    'transport_text': "Czas transportu modułów z APA do Lab.",
+    'check_in_text': "Czas przyjmowania modułów.",
+    'conditioning_time_text': "Czas kondycjonowania modułów.",
+    'deployment_time_text': "Czas trwania testu jednego modułu.",
+    'analysis_time_text': "Czas trwania analizy jednego modułu."
     }
 
     message = ObjectProperty()
@@ -429,6 +435,9 @@ class LtsApp(App):
     def enter_dissmis(self, window, key, *args):
         if key in [13, 32]:
             return QuestionPopup.popup_dissmis(self.root.questionpopup)
+    def refresh_key(self, window, key, *args):
+        if key in [9]:
+            return self.root.refresh(self.root.refresh)
 
     def build(self):
         self.title = "Symulacja procesu COP"

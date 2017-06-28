@@ -180,7 +180,7 @@
                             id: tc_refill_time_text
                             pos: label_tc_refill_time.x, label_tc_refill_time.texture_size[1] / 2
                             height: label_tc_refill_time.size[1]
-                            on_release: root.questionpopup.open("frq_text")
+                            on_release: root.questionpopup.open("tc_refill_time_text")
 
                 Label:
                     size_hint_y: None
@@ -208,6 +208,7 @@
                             id: transport_text
                             pos: label_delivery_time.x, label_delivery_time.texture_size[1] / 2
                             height: label_delivery_time.size[1]
+                            on_release: root.questionpopup.open("transport_text")
 
                     CustomLabel:
                         id: label_check_in_time
@@ -223,6 +224,7 @@
                             id: check_in_text
                             pos: label_check_in_time.x, label_check_in_time.texture_size[1] / 2
                             height: label_check_in_time.size[1]
+                            on_release: root.questionpopup.open("check_in_text")
 
                     CustomLabel:
                         id: label_conditioning_time
@@ -238,6 +240,7 @@
                             id: conditioning_time_text
                             pos: label_conditioning_time.x, label_conditioning_time.texture_size[1] / 2
                             height: label_conditioning_time.size[1]
+                            on_release: root.questionpopup.open("conditioning_time_text")
 
                     CustomLabel:
                         id: label_deployment_time
@@ -253,6 +256,7 @@
                             id: deployment_time_text
                             pos: label_deployment_time.x, label_deployment_time.texture_size[1] / 2
                             height: label_deployment_time.size[1]
+                            on_release: root.questionpopup.open("deployment_time_text")
 
                     CustomLabel:
                         id: label_analysis_time
@@ -268,6 +272,8 @@
                             id: analysis_time_text
                             pos: label_analysis_time.x, label_analysis_time.texture_size[1] / 2
                             height: label_analysis_time.size[1]
+                            on_release: root.questionpopup.open("analysis_time_text")
+
             BoxLayout:
                 size_hint_y: .06
                 orientation: 'horizontal'
