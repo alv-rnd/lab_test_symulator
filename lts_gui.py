@@ -175,8 +175,12 @@ class Graph_1(Screen):
         # self.add_widget(self.get_nav(wid))
 
 class Graph_2_Screen(Screen):
+    # graph_2_screen_py = ObjectProperty()
     def __init__(self, *args, **kwargs):
         super(Graph_2_Screen, self).__init__(**kwargs)
+        # self.log = log
+        # self.real_time = real_time
+        # Graph_2(self.log, self.real_time)
 
 
 class Graph_2(Graph):
@@ -184,9 +188,10 @@ class Graph_2(Graph):
     def __init__(self, *args, **kwargs):
         super(Graph_2, self).__init__(**kwargs)
 
+        # self.log = log
+        # self.real_time = real_time
         self.xlabel= 'Qty'
         self.ylabel= 'T'
-        self.x_ticks_minor= 5
         self.x_ticks_major= 25
         self.y_ticks_major= 1
         self.y_grid_label= True
@@ -198,9 +203,25 @@ class Graph_2(Graph):
         self.xmax= 100
         self.ymin= -1
         self.ymax= 1
-        self.plot = MeshLinePlot(color=[1, 1, 1, 1])
-        self.plot.points = [(x, math.sin(x / 10.)) for x in range(-0, 101)]
+        self.plot = MeshLinePlot(color=[60, 90, 60, 1])
+        # self.plot2 = MeshLinePlot(color=[180, 90, 60, 1])
+        # self.plot3 = MeshLinePlot(color=[300, 90, 60, 1])
+        # self.plot4 = MeshLinePlot(color=[16, 90, 50, 1])
+        # self.plot5 = MeshLinePlot(color=[280, 90, 50, 1])
+        # self.plot6 = MeshLinePlot(color=[90, 90, 60, 1])
+        self.plot.points = [(x, math.sin(x / 10)) for x in range(-0, 101)]
+        # self.plot2.points = [(x, self.log[2]) for x in range(-0, self.real_time)]
+        # self.plot3.points = [(x, self.log[3]) for x in range(-0, self.real_time)]
+        # self.plot4.points = [(x, self.log[4]) for x in range(-0, self.real_time)]
+        # self.plot5.points = [(x, self.log[5]) for x in range(-0, self.real_time)]
+        # self.plot6.points = [(x, self.log[6]) for x in range(-0, self.real_time)]
         self.add_plot(self.plot)
+        # self.add_plot(self.plot2)
+        # self.add_plot(self.plot3)
+        # self.add_plot(self.plot4)
+        # self.add_plot(self.plot5)
+        # self.add_plot(self.plot6)
+
 
 
 class Graph_3(Screen):
@@ -270,6 +291,7 @@ class LtsBoxLayout(BoxLayout):
     graph_1_py = ObjectProperty()
     time_slider_1_py = ObjectProperty()
     # screen_text_py = ObjectProperty()
+    # graph_2_screen_py = ObjectProperty()
     graphs = []
 
     def __init__(self, *args, **kwargs):
@@ -303,9 +325,11 @@ class LtsBoxLayout(BoxLayout):
         self.log = None
         # self.graph_1_py =
 
+
+
     @staticmethod
     def prepare_log(log, slider=None):
-        test_qty = 0 #len(log)
+        test_qty = 0 #len(log['Delivery']) #len(log)
 
         # slider = 400
 
@@ -361,7 +385,7 @@ class LtsBoxLayout(BoxLayout):
         self.real_time = sim1[1]
 
 
-        path_to_export = 'C:\\Users\mateusz.sobek\Desktop\Logi_sim_run\log_{}.xlsx'.format('1')
+        path_to_export = 'C:\\Users\mateusz.sobek\Desktop\Logi_sim_run\log_{}.xlsx'.format(np.random.random_integers(1000))
 
         self.log.to_excel(path_to_export)
         # if len(self.graphs) < 4:
@@ -372,6 +396,7 @@ class LtsBoxLayout(BoxLayout):
         #     self.graphs.append(g)
         # print(self.prepare_log(log))
         self.graph_1_py.add_plot(self.prepare_log(self.log))
+        # Graph_2(self.prepare_log(self.log), self.real_time)
 
     def export_excel(self):
         pass
