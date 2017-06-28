@@ -148,11 +148,11 @@ class Graph_1(Screen):
         for react in b1:
             if react == b1[-1]:
                 height = react.get_height()
-                ax.text(react.get_x() + react.get_width() / 2., 1.05 * height, '%d' %
+                ax.text(react.get_x() + react.get_width() / 2., 1.05 * height, '%d szt' %
                         int(height*10), ha='center', va='bottom', color='white')
             else:
                 height = react.get_height()
-                ax.text(react.get_x() + react.get_width() / 2., 1.05 * height, '%d' %
+                ax.text(react.get_x() + react.get_width() / 2., 1.05 * height, '%d szt' %
                         int(height), ha='center', va='bottom', color='white')
 
 
