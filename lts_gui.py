@@ -145,6 +145,10 @@ class Graph_1(Screen):
         plt.title('Symulacja {} - {} min'.format(1, (0 if time == None else round(time, 0))), color='white', fontsize=20)
         plt.legend()
 
+        height = b1[-1].get_height()
+        ax.text(b1[-1].get_x() + b1[-1].get_width() / 2., 1.05 * height, '%d' %
+                int(height * 10), ha='center', va='bottom', color='white')
+
         # ani = FuncAnimation(fig, update, frames=120, bl)
 
         wid = FigureCanvas(fig)
